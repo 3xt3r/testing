@@ -1,4 +1,40 @@
-
+    {
+      "type": "library",
+      "bom-ref": "pkg:deb/unixodbc@2.3.11-2+deb12u1+b2?arch=amd64",
+      "name": "unixodbc",
+      "version": "2.3.11-2+deb12u1+b2",
+      "purl": "pkg:deb/unixodbc@2.3.11-2+deb12u1+b2?arch=amd64",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "19d176e3d6c74eda828cf8be0ce4ef767e54f24cb518dec268c64e34bc477250"
+        }
+      ],
+      "properties": [
+        {
+          "name": "GOST:attack_surface",
+          "value": "no"
+        },
+        {
+          "name": "GOST:security_function",
+          "value": "no"
+        },
+        {
+          "name": "deb:filename",
+          "value": "unixodbc_2.3.11-2+deb12u1+b2_amd64.deb"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "file:///tmp/sbom-packages-764bur12/unixodbc_2.3.11-2%2Bdeb12u1%2Bb2_amd64.deb"
+        },
+        {
+          "type": "website",
+          "url": "http://www.unixodbc.org/"
+        }
+      ]
+    },
 Package: libodbc2
 Architecture: amd64
 Version: 2.3.11-2+deb12u1+b2
