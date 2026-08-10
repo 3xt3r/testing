@@ -1,79 +1,81 @@
-CVE-2026-50528 (CVSS 8.2, High)
-Компонент: System.Net.Security.NegotiateStream. Тип: CWE-693 (Protection Mechanism Failure). Механизм: на не-Windows хостах серверная реализация Negotiate-аутентификации не применяет корректно проверку Extended Protection (channel binding token), из-за чего аутентифицированные учётные данные Negotiate/NTLM могут быть ретранслированы (relay-атака) на сервер, который считает, что он защищён этим механизмом. Условие эксплуатации: сервер должен явно принимать входящие соединения через NegotiateStream в роли сервера на Linux/macOS с включённой (но фактически неработающей) политикой Extended Protection.
-Обоснование неприменимости: в системе не реализована серверная Negotiate/NTLM-аутентификация через NegotiateStream — соответствующий сетевой сервис отсутствует, атакующий вектор (relay через недоверенный канал) недостижим.
 
-CVE-2026-47304 (CVSS 8.1, Important)
-Компонент: System.Security.Cryptography.Xml (XML Signature / EncryptedXml). Тип: CWE-347 (Improper Verification of Cryptographic Signature) + CWE-345. Механизм: при верификации подписи с keyed-hash алгоритмом (HMAC) библиотека сравнивает только столько байт, сколько содержится в предоставленной атакующим подписи — то есть усечённая или нулевой длины подпись может совпасть с префиксом реального HMAC и пройти проверку как валидная. На .NET 6 этот компонент — опциональный NuGet-пакет, не входящий в shared framework. Условие эксплуатации: приложение должно явно подключать пакет System.Security.Cryptography.Xml и использовать его для проверки XML-подписей с алгоритмом HMAC.
-Обоснование неприменимости: пакет System.Security.Cryptography.Xml не подключён к проекту / XML-подписи с HMAC не проверяются — механизм верификации, содержащий уязвимость, физически отсутствует в сборке приложения.
+Package: libodbc2
+Architecture: amd64
+Version: 2.3.11-2+deb12u1+b2
+Multi-Arch: same
+Priority: optional
+Section: libs
+Source: unixodbc (2.3.11-2+deb12u1)
+Maintainer: Hugh McMaster <hugh.mcmaster@outlook.com>
+Installed-Size: 458
+Depends: libc6 (>= 2.17), libltdl7 (>= 2.4.7)
+Suggests: odbc-postgresql, tdsodbc
+Breaks: libodbc1 (<< 2.3.9-1~)
+Replaces: libodbc1 (<< 2.3.9-1~)
+Filename: pool/main/u/unixodbc/libodbc2_2.3.11-2+deb12u1+b2_amd64.deb
+Size: 150640
+MD5sum: f6a33c0309293a5ae47657e4a0a05fb0
+SHA1: 0c378087d87e4ea8131b57f67fec194fb66241a6
+SHA256: ae3e8c351ec32ad367e90fb795214e2634fc7b1de0447486731a9548eb13db52
+Homepage: http://www.unixodbc.org/
+Description: ODBC Driver Manager library for Unix
+ UnixODBC is an implementation of the Open Database Connectivity standard,
+ a database abstraction layer that allows applications to be used with
+ many different relational databases by way of a single library.
+ .
+ This package provides the unixODBC Driver Manager library.
+Unsigned-SHA1: 6e2e0d30a38fbb56fd429950c411ec7763326781
 
-CVE-2026-50650 (CVSS 7.8, High)
-Компонент: XAML-парсер Windows Presentation Foundation (WPF). Тип: CWE-693 (Protection Mechanism Failure). Механизм: restrictive XAML reader, который должен блокировать инстанцирование «опасных» .NET-типов при парсинге недоверенной разметки, обходится специально сформированным XAML-документом, что приводит к выполнению произвольного кода. Условие эксплуатации: локальный вектор атаки + взаимодействие пользователя — необходимо, чтобы пользователь открыл/загрузил вредоносный XAML-файл в WPF-приложении.
-Обоснование неприменимости: система не содержит WPF-компонентов и не предоставляет функциональность загрузки/открытия XAML-файлов из внешних источников — вектор атаки (открытие вредоносной разметки) физически отсутствует.
+Package: libodbccr2
+Architecture: amd64
+Version: 2.3.11-2+deb12u1+b2
+Multi-Arch: same
+Priority: optional
+Section: libs
+Source: unixodbc (2.3.11-2+deb12u1)
+Maintainer: Hugh McMaster <hugh.mcmaster@outlook.com>
+Installed-Size: 67
+Depends: libodbc2 (= 2.3.11-2+deb12u1+b2), libc6 (>= 2.14)
+Breaks: libodbc1 (<< 2.3.9-1~)
+Replaces: libodbc1 (<< 2.3.9-1~)
+Filename: pool/main/u/unixodbc/libodbccr2_2.3.11-2+deb12u1+b2_amd64.deb
+Size: 18244
+MD5sum: 2ebc3d7ed944df59af0992769d73d224
+SHA1: 3f5f2dd6104dd561f1ab4635710f70bcdad224b3
+SHA256: b420fc2c2bf2d7b214cbf310163eaf84e9f74cdef1f99ee97348fd56627303a9
+Homepage: http://www.unixodbc.org/
+Description: ODBC Cursor library for Unix
+ UnixODBC is an implementation of the Open Database Connectivity standard,
+ a database abstraction layer that allows applications to be used with
+ many different relational databases by way of a single library.
+ .
+ This package provides the unixODBC Cursor library.
+Unsigned-SHA1: f221c9f0453dbc679c746b48b289c3d747d2647c
 
-CVE-2026-50646 (CVSS 7.8, High)
-Компонент: тот же XAML-парсер WPF, тот же класс уязвимости restrictive-reader bypass, что и CVE-2026-50650 (зарегистрированы как отдельные CVE из-за разных вариантов обхода/разных дефектных типов, допускающих инстанцирование). CWE-693.
-Обоснование неприменимости: аналогично CVE-2026-50650 — отсутствие WPF в стеке приложения и отсутствие функциональности загрузки недоверенного XAML исключает применимость данной CVE.
-
-CVE-2026-50649 (CVSS 7.8, титулируется как RCE в .NET Framework)
-Компонент: WPF XAML restrictive reader (третий вариант того же класса дефектов). Официально в записях Microsoft описан как «.NET Framework Remote Code Execution», хотя фактический механизм и вектор — тот же XAML parsing bypass, что и в предыдущих двух CVE.
-Обоснование неприменимости: идентично — приложение не использует WPF/не обрабатывает XAML из недоверенных источников.
-
-CVE-2026-47302 (CVSS 7.5, Important)
-Компонент: обработка .NET XML (System.Security.Cryptography.Xml, System.Xml). Тип: CWE-400 (Allocation of Resources Without Limits or Throttling). Механизм: неограниченное потребление памяти/CPU при парсинге специально сформированного XML-документа (например, за счёт вложенности, ссылок на сущности или больших структур) приводит к отказу в обслуживании. Условие эксплуатации: сервис должен принимать и обрабатывать XML-ввод из недоверенного источника без ограничений размера/сложности документа.
-Обоснование неприменимости: приложение не предоставляет публичный/недоверенный endpoint, принимающий и парсящий произвольный XML через указанные API — путь эксплуатации недостижим.
-
-CVE-2026-50525 (CVSS 7.5, Important)
-Компонент: System.Security.Cryptography.Xml. Тип: CWE-400, тот же класс DoS через неограниченное выделение ресурсов, но в другом участке кода (обработка структур XML-подписи/шифрования, отдельно от CVE-2026-47302).
-Обоснование неприменимости: пакет/функциональность XML-подписи и XML-шифрования через System.Security.Cryptography.Xml в приложении не используется — код-путь не вызывается.
-
-CVE-2026-50527 (CVSS 7.5, Important)
-Компонент: System.Security.Cryptography.Xml. Тип: CWE-121/122 (Stack-based Buffer Overflow), приводящий к DoS (аварийному завершению процесса) при обработке специально сформированного XML-документа с подписью/шифрованием.
-Обоснование неприменимости: аналогично — компонент XML-криптографии не подключён/не задействован для обработки внешнего ввода.
-
-CVE-2026-50648 (CVSS 7.5, Important)
-Компонент: System.Security.Cryptography.Xml. Тип: CWE-400, ещё один независимый участок кода с неограниченным выделением ресурсов при обработке XML-подписи/шифрования (третья отдельная CVE в этом компоненте после 47302 и 50525).
-Обоснование неприменимости: идентично двум предыдущим — функциональность компонента не используется приложением.
-
-CVE-2026-57108 (CVSS 7.5)
-Компонент: Microsoft.NETCore.App.Runtime.* (базовый рантайм). Точный технический механизм публично не детализирован (advisory ещё не полностью раскрыт), но классифицирован как High-severity дефект рантайма, требующий конкретного workflow с использованием затронутой runtime-функции для триггера.
-Обоснование неприменимости: используемый сценарий работы приложения не задействует конкретную runtime-функцию/API, к которой привязана уязвимость (согласно проверке зависимостей и трассировке вызовов в проекте) — код-путь недостижим в текущей архитектуре.
-
-CVE-2026-50651 (CVSS 7.5, Important)
-Компонент: Microsoft.NETCore.App.Runtime.*. Тип: CWE-400 (Allocation of Resources Without Limits or Throttling), сетевой вектор, доступен неаутентифицированному атакующему. Механизм аналогичен CVE-2026-47302/50525/50648, но локализован непосредственно в runtime, а не в компоненте XML-криптографии.
-Обоснование неприменимости: сервис не выставляет наружу сетевой интерфейс, принимающий недоверенный ввод через уязвимый API выделения ресурсов рантайма — путь эксплуатации отсутствует.
-
-CVE-2026-50524 (CVSS 7.5, Important)
-Компонент: TLS/SSL-стек (System.Net.Security). Тип: некорректная валидация определённого типа входных данных, приводящая к DoS. Механизм: обрабатывается TLS-хендшейк/сообщение с определённой некорректной структурой, вызывая крах/зависание процесса. Условие эксплуатации: сетевой, неаутентифицированный вектор, без взаимодействия пользователя — сервис должен принимать входящие TLS-соединения через уязвимый код-путь System.Net.Security.
-Обоснование неприменимости: приложение либо не терминирует TLS напрямую через System.Net.Security (TLS terminates на внешнем балансировщике/прокси), либо не обрабатывает тип входных данных, вызывающий сбой, — уязвимая функция не задействована в конфигурации.
-
-CVE-2026-50526 (CVSS 7.0, Important)
-Компонент: .NET Framework (конкретный субкомпонент, отвечающий за парсинг структурированных данных). Тип: CWE-121/122 (Stack-based Buffer Overflow), DoS по сети. Условие эксплуатации: приложение должно обрабатывать специфический формат данных через уязвимую функцию парсинга, вызывая переполнение стека при получении специально сформированного ввода.
-Обоснование неприменимости: соответствующая функция парсинга данных, содержащая дефект, не вызывается в текущем коде/сценариях использования приложения — атакующий не может достичь уязвимого пути через доступные интерфейсы.
-
-CVE-2026-50659 (CVSS 6.5, Medium)
-Компонент: Microsoft.NETCore.App.Runtime.*. Тип: tampering (подмена данных), самая низкая критичность в июльском наборе .NET-патчей. Механизм требует специфического локального сценария, в котором атакующий может подменить данные, обрабатываемые определённой runtime-функцией.
-Обоснование неприменимости: соответствующий workflow (локальная подмена данных через указанную функцию рантайма) в системе отсутствует — нет сценария использования, при котором атакующий получает контроль над входными данными этой функции.
-
-CVE-2026-47303 (CVSS 8.8, Important — наиболее критичная в наборе)
-Компонент: опциональный NuGet-пакет Microsoft.AspNetCore.Authentication.Negotiate, конкретно — внутренний LdapAdapter, отвечающий за разрешение вложенных групп Active Directory (nested group resolution) в LDAP role-claim. Тип: CWE-302 (Authentication Bypass by Assumed-Immutable Data) + CWE-863 + CWE-90 (LDAP Injection). Механизм: при разрешении вложенной группы LdapAdapter берёт компонент CN из distinguished name атрибута memberOf и ищет группу, у которой sAMAccountName равен этому CN. Поскольку CN и sAMAccountName — независимо задаваемые атрибуты AD, аутентифицированный атакующий, способный создать/переименовать группу, может подобрать CN так, чтобы он совпал с sAMAccountName привилегированной группы, — в результате приложение присвоит атакующему роли этой привилегированной группы. Условие эксплуатации: приложение должно использовать пакет Negotiate с включённым LDAP role-claim resolution и default nested-group handling, а в AD-инфраструктуре атакующий должен иметь возможность создавать/переименовывать группы.
-Обоснование неприменимости: пакет Microsoft.AspNetCore.Authentication.Negotiate не подключён, либо подключён без включённого разрешения вложенных AD-групп (nested-group role-claim resolution) — уязвимый LdapAdapter не задействован в цепочке авторизации.
-
-CVE-2026-33117 (CVSS 9.1, Critical)
-Компонент: Azure Key Vault Keys библиотека для Java (azure-security-keyvault-keys), локальный путь криптографической верификации. Тип: CWE-287 (Improper Authentication) + CWE-347. Механизм: сравнение authentication tag в локальной операции AEAD-расшифровки реализовано некорректно (не константное по времени и/или логически неверное сравнение), что позволяет специально сформированному зашифрованному вводу пройти проверку целостности без валидного тега аутентификации. Важно: операции, делегированные самому сервису Key Vault (когда криптографические операции выполняются на стороне Azure, а не локально в приложении), этой уязвимостью не затронуты — затронут только локальный крипто-путь SDK.
-Обоснование неприменимости: приложение использует Azure Key Vault в режиме делегированных операций (криптографические вычисления выполняются на стороне сервиса Key Vault, а не через локальный крипто-путь SDK) — уязвимый локальный код verify не вызывается.
-
-CVE-2026-5598 (CVSS ~8.9, High)
-Компонент: Bouncy Castle BC-JAVA, файл FrodoEngine.java, реализация FrodoKEM — постквантового key encapsulation механизма на решётках. Тип: CWE-385 (Covert Timing Channel). Механизм: сравнения, задействованные при верификации в процессе декапсуляции ключа, выполняются за не константное время, что позволяет удалённому неаутентифицированному атакующему через анализ временных вариаций при отправке большого количества специально сформированных шифротекстов постепенно извлечь приватный ключ сервера (side-channel атака). Условие эксплуатации: приложение/сервер должен использовать именно алгоритм FrodoKEM для key exchange и принимать запросы key encapsulation от недоверенных клиентов.
-Обоснование неприменимости: в системе для постквантовой криптографии (если она вообще применяется) используется другой алгоритм (например, Kyber/ML-KEM), либо постквантовый key exchange не используется вовсе — FrodoEngine и связанный с ним код-путь не задействованы.
-
-CVE-2026-3505 (CVSS 8.7, High)
-Компонент: Bouncy Castle BC-JAVA, модуль bcpg (файлы AEADEncDataPacket.java, BcAEADUtil.java, JceAEADUtil.java, OperatorHelper.java) — реализация обработки OpenPGP AEAD-пакетов. Тип: CWE-400 (Allocation of Resources Without Limits or Throttling). Механизм: размер AEAD-чанка в PGP-сообщении не ограничен, что позволяет неаутентифицированному атакующему отправить специально сформированное PGP-сообщение с чрезмерно большим заявленным размером чанка, вызывая pre-auth (до какой-либо аутентификации/проверки подписи) истощение памяти/ресурсов при попытке его обработать.
-Обоснование неприменимости: приложение не реализует функциональность приёма/расшифровки OpenPGP-сообщений через модуль bcpg — соответствующий парсер AEAD-пакетов не вызывается в системе.
-
-CVE-2023-2976 (устаревшая, добавлена в NVD в 2023 г.)
-Компонент: Google Guava, метод com.google.common.io.Files.createTempDir(). Тип: CWE-379 (Creation of Temporary File with Insecure Permissions). Механизм: метод создаёт временный каталог с правами доступа, зависящими от системного umask, что в многопользовательской POSIX-среде с общим /tmp может привести к тому, что другой локальный пользователь получит доступ на чтение/запись к временным файлам приложения — потенциальная утечка данных или атака через гонку (TOCTOU). Условие эксплуатации: вызов именно этого метода Guava + многопользовательская среда исполнения с общим временным каталогом.
-Обоснование неприменимости: в кодовой базе метод Files.createTempDir() не вызывается (используется, например, java.nio.file.Files.createTempDirectory() с явно заданными безопасными правами доступа), либо приложение исполняется в изолированном/однопользовательском окружении без общего /tmp — условие эксплуатации отсутствует.
-
-CVE-2026-54512 (CVSS 8.1, High)
-Компонент: jackson-databind, метод DatabindContext._resolveAndValidateGeneric() в связке с BasicPolymorphicTypeValidator.validateSubType(). Тип: CWE-502 (Deserialization of Untrusted Data) / обход механизма защиты. Механизм: при включённом полиморфном тайпинге и наличии в строке идентификатора типа generic-параметров (символ <), метод валидирует по allow-list PolymorphicTypeValidator только «сырое» имя класса-контейнера (часть строки до <), но не проверяет вложенные типовые аргументы. Это позволяет атакующему указать разрешённый контейнер (например, java.util.ArrayList) с запрещённым классом в качестве generic-параметра (java.util.ArrayList<com.evil.Gadget>) — контейнер проходит проверку PTV, после чего вложенный класс загружается через Class.forName(), инстанцируется и заполняется данными из JSON, что при наличии подходящей gadget-цепочки в classpath приводит к RCE. Условие эксплуатации: приложение должно использовать полиморфную десериализацию Jackson (@JsonTypeInfo / default typing) с настроенным PolymorphicTypeValidator и обрабатывать JSON из недоверенного источника.
-Обоснование неприменимости: полиморфная десериализация Jackson (@JsonTypeInfo/default typing) в проекте не включена — вся десериализация выполняется по фиксированным (не полиморфным) типам, поэтому код-путь _resolveAndValidateGeneric() с обходом PTV не вызывается независимо от версии библиотеки.
+Package: libodbcinst2
+Architecture: amd64
+Version: 2.3.11-2+deb12u1+b2
+Multi-Arch: same
+Priority: optional
+Section: libs
+Source: unixodbc (2.3.11-2+deb12u1)
+Maintainer: Hugh McMaster <hugh.mcmaster@outlook.com>
+Installed-Size: 101
+Depends: unixodbc-common (>= 2.3.11-2+deb12u1+b2), libc6 (>= 2.14), libltdl7 (>= 2.4.7)
+Breaks: odbcinst1debian2 (<< 2.3.9-1~)
+Replaces: odbcinst1debian2 (<< 2.3.9-1~)
+Filename: pool/main/u/unixodbc/libodbcinst2_2.3.11-2+deb12u1+b2_amd64.deb
+Size: 34740
+MD5sum: a7ea1ee6501e4df04fb521ed9a49420b
+SHA1: 96e093b207082de730f348b14b13eebaa4db6a33
+SHA256: b31b94cd12aef9b14a3cf94ab0fcf3322b9e06225add5d18fe270dfe6aa2c195
+Homepage: http://www.unixodbc.org/
+Description: Support library for accessing ODBC configuration files
+ UnixODBC is an implementation of the Open Database Connectivity standard,
+ a database abstraction layer that allows applications to be used with
+ many different relational databases by way of a single library.
+ .
+ This package contains the odbcinst library from unixODBC, a library
+ used by ODBC drivers to read their configuration from /etc/odbcinst.ini
+ and the system and user-specific odbc.ini files.
+Unsigned-SHA1: 366981b149c1e7aa44d0e52935f36a771b5fb68a
