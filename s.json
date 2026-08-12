@@ -1,0 +1,276 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:a9a822e5-91ad-4917-8687-17690c414ede",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-08-12T09:37:00Z",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "ChatGPT",
+          "version": "GPT-5.6 Sol"
+        }
+      ]
+    },
+    "component": {
+      "type": "data",
+      "bom-ref": "nodejs-secure-versions-catalog-2026-08-12",
+      "name": "Node.js supported patched versions catalog",
+      "version": "2026-08-12"
+    },
+    "properties": [
+      {
+        "name": "scope",
+        "value": "Node.js versions in currently supported release lines that are at or newer than the 2026-07-29 security releases"
+      },
+      {
+        "name": "warning",
+        "value": "Safe means no superseding Node.js security advisory was identified as of 2026-08-12; it is not a guarantee of absence of unknown vulnerabilities."
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "framework",
+      "bom-ref": "nodejs-22.23.2",
+      "publisher": "OpenJS Foundation",
+      "name": "Node.js",
+      "version": "22.23.2",
+      "cpe": "cpe:2.3:a:nodejs:node.js:22.23.2:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "release-notes",
+          "url": "https://nodejs.org/en/blog/release/v22.23.2"
+        },
+        {
+          "type": "website",
+          "url": "https://nodejs.org/"
+        }
+      ],
+      "properties": [
+        {
+          "name": "security:status",
+          "value": "supported-and-patched-as-of-2026-08-12"
+        },
+        {
+          "name": "security:baseline",
+          "value": "2026-07-29-security-release-or-newer"
+        },
+        {
+          "name": "nodejs:release-line",
+          "value": "22"
+        },
+        {
+          "name": "nodejs:support-status",
+          "value": "LTS"
+        },
+        {
+          "name": "nodejs:release-kind",
+          "value": "security-release"
+        }
+      ]
+    },
+    {
+      "type": "framework",
+      "bom-ref": "nodejs-24.18.1",
+      "publisher": "OpenJS Foundation",
+      "name": "Node.js",
+      "version": "24.18.1",
+      "cpe": "cpe:2.3:a:nodejs:node.js:24.18.1:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "release-notes",
+          "url": "https://nodejs.org/en/blog/release/v24.18.1"
+        },
+        {
+          "type": "website",
+          "url": "https://nodejs.org/"
+        }
+      ],
+      "properties": [
+        {
+          "name": "security:status",
+          "value": "supported-and-patched-as-of-2026-08-12"
+        },
+        {
+          "name": "security:baseline",
+          "value": "2026-07-29-security-release-or-newer"
+        },
+        {
+          "name": "nodejs:release-line",
+          "value": "24"
+        },
+        {
+          "name": "nodejs:support-status",
+          "value": "LTS"
+        },
+        {
+          "name": "nodejs:release-kind",
+          "value": "security-release"
+        }
+      ]
+    },
+    {
+      "type": "framework",
+      "bom-ref": "nodejs-24.19.0",
+      "publisher": "OpenJS Foundation",
+      "name": "Node.js",
+      "version": "24.19.0",
+      "cpe": "cpe:2.3:a:nodejs:node.js:24.19.0:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "release-notes",
+          "url": "https://nodejs.org/en/blog/release/v24.19.0"
+        },
+        {
+          "type": "website",
+          "url": "https://nodejs.org/"
+        }
+      ],
+      "properties": [
+        {
+          "name": "security:status",
+          "value": "supported-and-patched-as-of-2026-08-12"
+        },
+        {
+          "name": "security:baseline",
+          "value": "2026-07-29-security-release-or-newer"
+        },
+        {
+          "name": "nodejs:release-line",
+          "value": "24"
+        },
+        {
+          "name": "nodejs:support-status",
+          "value": "LTS"
+        },
+        {
+          "name": "nodejs:release-kind",
+          "value": "post-security-release"
+        }
+      ]
+    },
+    {
+      "type": "framework",
+      "bom-ref": "nodejs-26.5.1",
+      "publisher": "OpenJS Foundation",
+      "name": "Node.js",
+      "version": "26.5.1",
+      "cpe": "cpe:2.3:a:nodejs:node.js:26.5.1:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "release-notes",
+          "url": "https://nodejs.org/en/blog/release/v26.5.1"
+        },
+        {
+          "type": "website",
+          "url": "https://nodejs.org/"
+        }
+      ],
+      "properties": [
+        {
+          "name": "security:status",
+          "value": "supported-and-patched-as-of-2026-08-12"
+        },
+        {
+          "name": "security:baseline",
+          "value": "2026-07-29-security-release-or-newer"
+        },
+        {
+          "name": "nodejs:release-line",
+          "value": "26"
+        },
+        {
+          "name": "nodejs:support-status",
+          "value": "Current"
+        },
+        {
+          "name": "nodejs:release-kind",
+          "value": "security-release"
+        }
+      ]
+    },
+    {
+      "type": "framework",
+      "bom-ref": "nodejs-26.6.0",
+      "publisher": "OpenJS Foundation",
+      "name": "Node.js",
+      "version": "26.6.0",
+      "cpe": "cpe:2.3:a:nodejs:node.js:26.6.0:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "release-notes",
+          "url": "https://nodejs.org/en/blog/release/v26.6.0"
+        },
+        {
+          "type": "website",
+          "url": "https://nodejs.org/"
+        }
+      ],
+      "properties": [
+        {
+          "name": "security:status",
+          "value": "supported-and-patched-as-of-2026-08-12"
+        },
+        {
+          "name": "security:baseline",
+          "value": "2026-07-29-security-release-or-newer"
+        },
+        {
+          "name": "nodejs:release-line",
+          "value": "26"
+        },
+        {
+          "name": "nodejs:support-status",
+          "value": "Current"
+        },
+        {
+          "name": "nodejs:release-kind",
+          "value": "post-security-release"
+        }
+      ]
+    },
+    {
+      "type": "framework",
+      "bom-ref": "nodejs-26.7.0",
+      "publisher": "OpenJS Foundation",
+      "name": "Node.js",
+      "version": "26.7.0",
+      "cpe": "cpe:2.3:a:nodejs:node.js:26.7.0:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "release-notes",
+          "url": "https://nodejs.org/en/blog/release/v26.7.0"
+        },
+        {
+          "type": "website",
+          "url": "https://nodejs.org/"
+        }
+      ],
+      "properties": [
+        {
+          "name": "security:status",
+          "value": "supported-and-patched-as-of-2026-08-12"
+        },
+        {
+          "name": "security:baseline",
+          "value": "2026-07-29-security-release-or-newer"
+        },
+        {
+          "name": "nodejs:release-line",
+          "value": "26"
+        },
+        {
+          "name": "nodejs:support-status",
+          "value": "Current"
+        },
+        {
+          "name": "nodejs:release-kind",
+          "value": "post-security-release"
+        }
+      ]
+    }
+  ]
+}
