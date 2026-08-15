@@ -1,1 +1,14 @@
-nginx	1.30.2-alt1	nginx-1.30.2-alt1.src.rpm	1.30.1-alt1	CRITICAL	BDU:2026-08881, BDU:2026-08934, BDU:2026-09927, BDU:2026-10486, BDU:2026-10487, CVE-2026-42055, CVE-2026-42533, CVE-2026-48142, CVE-2026-56434, CVE-2026-60005
+  "bomFormat": "CycloneDX",
+    "specVersion": "1.6",
+    "version": 1,
+    "metadata": {
+        "timestamp": "2026-08-12T15:21:34Z",
+        "component": {
+            "type": "application",
+            "name": "Garda NDR",
+            "version": "4.5",
+            "manufacturer": {
+                "name": "GARDA TECHNOLOGIES, LLC"
+            }
+        }
+  },
