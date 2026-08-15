@@ -1,4 +1,44 @@
-2026-08-15 21:33:51 | INFO    | [NDR / 4.5] GOST cert: running for origsbom.json (os_pkgs_dir='')
-2026-08-15 22:03:52 | WARNING | [NDR / 4.5] GOST cert: TIMED OUT after 1800s for origsbom.json
-2026-08-15 22:03:52 | INFO    | [NDR / 4.5] wrote GOST default-properties copy /home/csecuser/results/2026-08-15/NDR__4.5/sbom/cplus_sbom.merged_cert.json (tagged 24 component(s))
-2026-08-15 22:03:52 | INFO    | [distrib] started thread for NDR / 4.5 / NDR_alt
+{
+      "type": "framework",
+      "name": ".NET Runtime",
+      "version": "10.0.0",
+      "properties": [
+        {
+          "name": "GOST:attack_surface",
+          "value": "yes"
+        },
+        {
+          "name": "GOST:security_function",
+          "value": "yes"
+        }
+      ],
+      "cpe": "cpe:2.3:a:microsoft:.net:10.0.0:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/dotnet/runtime/tree/v10.0.0"
+        }
+      ]
+    },
+    {
+      "type": "framework",
+      "name": "ASP.NET Core",
+      "version": "10.0.0",
+      "properties": [
+        {
+          "name": "GOST:attack_surface",
+          "value": "no"
+        },
+        {
+          "name": "GOST:security_function",
+          "value": "no"
+        }
+      ],
+      "cpe": "cpe:2.3:a:microsoft:asp.net_core:10.0.0:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/dotnet/aspnetcore/tree/v10.0.0"
+        }
+      ]
+    },
