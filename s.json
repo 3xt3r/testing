@@ -1,14 +1,4 @@
-  "bomFormat": "CycloneDX",
-    "specVersion": "1.6",
-    "version": 1,
-    "metadata": {
-        "timestamp": "2026-08-12T15:21:34Z",
-        "component": {
-            "type": "application",
-            "name": "Garda NDR",
-            "version": "4.5",
-            "manufacturer": {
-                "name": "GARDA TECHNOLOGIES, LLC"
-            }
-        }
-  },
+2026-08-15 21:33:51 | INFO    | [NDR / 4.5] GOST cert: running for origsbom.json (os_pkgs_dir='')
+2026-08-15 22:03:52 | WARNING | [NDR / 4.5] GOST cert: TIMED OUT after 1800s for origsbom.json
+2026-08-15 22:03:52 | INFO    | [NDR / 4.5] wrote GOST default-properties copy /home/csecuser/results/2026-08-15/NDR__4.5/sbom/cplus_sbom.merged_cert.json (tagged 24 component(s))
+2026-08-15 22:03:52 | INFO    | [distrib] started thread for NDR / 4.5 / NDR_alt
