@@ -1,25 +1,83 @@
-SRC="/home/kali/product"
-DST="/home/kali/product_binaries"
+SCAN_DIR="/home/kali/product_binaries" python - <<'PY'
+import os
+import json
+from pathlib import Path
 
-rm -rf "$DST"
-mkdir -p "$DST"
+from cve_bin_tool.version_scanner import VersionScanner
 
-find "$SRC" -type f -print0 |
-while IFS= read -r -d '' f; do
+root = os.environ["SCAN_DIR"]
 
-    type="$(file -b "$f" 2>/dev/null || true)"
+scanner = VersionScanner(
+    no_scan=True,
+    should_extract=False,
+    validate=False,
+)
 
-    case "$type" in
-        ELF*|PE32*|PE32+*|Mach-O*|WebAssembly*)
-            rel="${f#$SRC/}"
-            mkdir -p "$DST/$(dirname "$rel")"
-            cp -a "$f" "$DST/$rel"
-            echo "[BINARY] $rel"
-            ;;
-    esac
+found = {}
 
-done
+print(f"\nScanning: {root}\n")
 
-echo
-echo "Binary files:"
-find "$DST" -type f | wc -l
+for result in scanner.recursive_scan(root):
+    if not result:
+        continue
+
+    p = result.product_info
+
+    key = (
+        p.vendor,
+        p.product,
+        p.version,
+        result.file_path,
+    )
+
+    found[key] = {
+        "vendor": p.vendor,
+        "product": p.product,
+        "version": p.version,
+        "path": result.file_path,
+    }
+
+results = list(found.values())
+
+print()
+print("=" * 100)
+print(f"{'VENDOR':20} {'PRODUCT':30} {'VERSION':20} PATH")
+print("=" * 100)
+
+for item in sorted(
+    results,
+    key=lambda x: (
+        x["product"],
+        x["version"],
+        x["path"],
+    ),
+):
+    print(
+        f'{item["vendor"][:20]:20} '
+        f'{item["product"][:30]:30} '
+        f'{item["version"][:20]:20} '
+        f'{item["path"]}'
+    )
+
+output = Path("cve-bin-components.json")
+
+output.write_text(
+    json.dumps(
+        {
+            "scanner": "cve-bin-tool VersionScanner",
+            "mode": "component-detection-only",
+            "scan_root": root,
+            "components": results,
+        },
+        indent=2,
+        ensure_ascii=False,
+    ),
+    encoding="utf-8",
+)
+
+print()
+print("=" * 100)
+print(f"Detected components: {len(results)}")
+print(f"JSON: {output.resolve()}")
+print("=" * 100)
+PY
