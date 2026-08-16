@@ -1,2 +1,82 @@
-RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      Symbols         FORTIFY Fortified       Fortifiable     FILE
-Partial RELRO   Canary found      NX enabled    No PIE          No RPATH   No RUNPATH   No Symbols        Yes   15              35              
+DIR="/home/kali/Desktop/pt_binaries"
+
+find "$DIR" -type f -print0 |
+while IFS= read -r -d '' BIN; do
+
+    TYPE="$(file -b "$BIN" 2>/dev/null || true)"
+
+    # Только ELF
+    [[ "$TYPE" == ELF* ]] || continue
+
+    echo
+    echo "================================================================================"
+    echo "FILE: $BIN"
+    echo "================================================================================"
+
+    echo
+    echo "=== TYPE ==="
+    echo "$TYPE"
+
+    echo
+    echo "=== COMPILER / .comment ==="
+    readelf -p .comment "$BIN" 2>/dev/null || echo "No .comment section"
+
+    echo
+    echo "=== RECORDED GCC FLAGS ==="
+    readelf -p .GCC.command.line "$BIN" 2>/dev/null || echo "No recorded GCC command line"
+
+    echo
+    echo "=== SYMBOL / DEBUG SECTIONS ==="
+    SECTIONS="$(
+        readelf -S "$BIN" 2>/dev/null |
+        grep -Ei '\.debug_|\.zdebug_|\.symtab|\.dynsym|\.comment|GCC\.command' \
+        || true
+    )"
+
+    if [[ -n "$SECTIONS" ]]; then
+        echo "$SECTIONS"
+    else
+        echo "No debug/symbol sections found"
+    fi
+
+    echo
+    echo "=== LINKED LIBRARIES / DT_NEEDED ==="
+    NEEDED="$(
+        readelf -d "$BIN" 2>/dev/null |
+        grep NEEDED \
+        || true
+    )"
+
+    if [[ -n "$NEEDED" ]]; then
+        echo "$NEEDED"
+    else
+        echo "No DT_NEEDED entries (possibly static binary)"
+    fi
+
+    echo
+    echo "=== DWARF COMPILER INFO ==="
+    DWARF="$(
+        readelf --debug-dump=info "$BIN" 2>/dev/null |
+        grep -m10 -E 'DW_AT_producer|DW_AT_language|DW_AT_comp_dir' \
+        || true
+    )"
+
+    if [[ -n "$DWARF" ]]; then
+        echo "$DWARF"
+    else
+        echo "No useful DWARF information"
+    fi
+
+    echo
+    echo "=== HARDENING / CHECKSEC ==="
+
+    if command -v checksec >/dev/null 2>&1; then
+        checksec --file="$BIN" 2>/dev/null || true
+    else
+        echo "checksec not installed"
+    fi
+
+    echo
+    echo "================================================================================"
+
+done
