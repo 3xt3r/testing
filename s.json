@@ -1,44 +1,13 @@
-{
-      "type": "framework",
-      "name": ".NET Runtime",
-      "version": "10.0.0",
-      "properties": [
-        {
-          "name": "GOST:attack_surface",
-          "value": "yes"
-        },
-        {
-          "name": "GOST:security_function",
-          "value": "yes"
-        }
-      ],
-      "cpe": "cpe:2.3:a:microsoft:.net:10.0.0:*:*:*:*:*:*:*",
-      "externalReferences": [
-        {
-          "type": "vcs",
-          "url": "https://github.com/dotnet/runtime/tree/v10.0.0"
-        }
-      ]
-    },
-    {
-      "type": "framework",
-      "name": "ASP.NET Core",
-      "version": "10.0.0",
-      "properties": [
-        {
-          "name": "GOST:attack_surface",
-          "value": "no"
-        },
-        {
-          "name": "GOST:security_function",
-          "value": "no"
-        }
-      ],
-      "cpe": "cpe:2.3:a:microsoft:asp.net_core:10.0.0:*:*:*:*:*:*:*",
-      "externalReferences": [
-        {
-          "type": "vcs",
-          "url": "https://github.com/dotnet/aspnetcore/tree/v10.0.0"
-        }
-      ]
-    },
+WARNING: https://crates.io/api/v1/crates/proc-macro-crate/1.1.0/download не указывает на архив или не существует
+--------------------------------------------------
+WARNING: https://crates.io/api/v1/crates/thiserror-impl/1.0.50/download не указывает на архив или не существует
+--------------------------------------------------
+WARNING: https://crates.io/api/v1/crates/ctr/0.8.0/download не указывает на архив или не существует
+--------------------------------------------------
+WARNING: https://crates.io/api/v1/crates/ppv-lite86/0.2.17/download не указывает на архив или не существует
+--------------------------------------------------
+WARNING: pkg:rpm/clickhouse-client@25.8.18.1-1?arch=x86_64&epoch=0&upstream=clickhouse-client-25.8.18.1-1.src.rpm не подходит под спецификацию purl: Namespace is required for purl type: 'rpm'
+Invalid qualifiers found: upstream. Allowed qualifiers are: arch, checksum, download_url, epoch, file_name, repository_url, vcs_url, vers
+--------------------------------------------------
+WARNING: pkg:rpm/clickhouse-common-static@25.8.18.1-1?arch=x86_64&epoch=0&upstream=clickhouse-common-static-25.8.18.1-1.src.rpm не подходит под спецификацию purl: Namespace is required for purl type: 'rpm'
+Invalid qualifiers found: upstream. Allowed qualifiers are: arch, checksum, download_url, epoch, file_name, repository_url, vcs_url, vers
