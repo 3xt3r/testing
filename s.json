@@ -1,39 +1,8 @@
-NYXSTONE_LLVM_PREFIX=/usr/lib/llvm-21
-LLVM=21.1.8
-
-Obtaining file:///home/kali/blint-db
-  Installing build dependencies ... done
-  Checking if build backend supports build_editable ... done
-  Getting requirements to build editable ... done
-  Preparing editable metadata (pyproject.toml) ... done
-Requirement already satisfied: blint in /home/kali/Desktop/ptnad/venv/lib/python3.14/site-packages (from blint-db==2.0.0) (3.2.4)
-Collecting conan>=2.28.0 (from blint-db==2.0.0)
-  Downloading conan-2.31.2-py3-none-any.whl.metadata (8.6 kB)
-Collecting huggingface-hub>=1.12.2 (from blint-db==2.0.0)
-  Downloading huggingface_hub-1.27.0-py3-none-any.whl.metadata (16 kB)
-Collecting meson>=1.11.1 (from blint-db==2.0.0)
-  Downloading meson-1.12.0-py3-none-any.whl.metadata (1.7 kB)
-Collecting ninja>=1.13.0 (from blint-db==2.0.0)
-  Downloading ninja-1.13.0-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (5.1 kB)
-Requirement already satisfied: oras>=0.2.42 in /home/kali/Desktop/ptnad/venv/lib/python3.14/site-packages (from blint-db==2.0.0) (0.2.43)
-Collecting nyxstone>=0.1.1 (from blint-db==2.0.0)
-  Downloading nyxstone-0.1.8.tar.gz (38 kB)
-  Installing build dependencies ... done
-  Getting requirements to build wheel ... error
-  error: subprocess-exited-with-error
-  
-  × Getting requirements to build wheel did not run successfully.
-  │ exit code: 1
-  ╰─> [1 lines of output]
-      LLVM Major version must be in the range 15-20, found 21! Set the environment variable $NYXSTONE_LLVM_PREFIX to tell nyxstone about the install location of LLVM.
-      [end of output]
-  
-  note: This error originates from a subprocess, and is likely not a problem with pip.
-ERROR: Failed to build 'nyxstone' when getting requirements to build wheel
-                                                                                                                                                                                                                                           
-============================================================
-Installation failed with code: 1
-Terminal remains open.
-============================================================
-
-                                          
+sudo apt install -y llvm-19 llvm-19-dev clang-19 && \
+export NYXSTONE_LLVM_PREFIX=/usr/lib/llvm-19 && \
+export PATH="/usr/lib/llvm-19/bin:$PATH" && \
+export CC=/usr/lib/llvm-19/bin/clang && \
+export CXX=/usr/lib/llvm-19/bin/clang++ && \
+echo "LLVM for Nyxstone: $(llvm-config --version)" && \
+cd ~/blint-db && \
+pip install -e '.[extended]'
