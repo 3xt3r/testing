@@ -1,18 +1,7 @@
-find /home/kali/Desktop/pt_binaries -type f -print0 |
-while IFS= read -r -d '' f; do
+ELF64
+    Compiler: Go(1.24.1)
+    Compiler: GCC(3.X)
+    Library: GLIBC(2.7)[EXEC AMD64-64]
 
-    TYPE="$(file -b "$f" 2>/dev/null || true)"
+================================================================================
 
-    case "$TYPE" in
-        ELF*|PE32*|PE32+*|Mach-O*)
-            echo
-            echo "================================================================================"
-            echo "FILE: $f"
-            echo "TYPE: $TYPE"
-            echo "--------------------------------------------------------------------------------"
-            diec "$f"
-            echo "================================================================================"
-            ;;
-    esac
-
-done | tee die-results.txt
