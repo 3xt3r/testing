@@ -1,42 +1,27 @@
-Сначала выполни не установщик, а это:
-
-cat /etc/apt/sources.list.d/kali.sources
-
-Для актуального Kali 2026.2 там должно быть примерно:
-
-Types: deb
-URIs: http://http.kali.org/kali/
-Suites: kali-rolling
-Components: main contrib non-free non-free-firmware
-Signed-By: /usr/share/keyrings/kali-archive-keyring.gpg
-
-Это текущая официальная конфигурация Kali.
-
-Потом очисти старые индексы и скачай их заново:
-
-sudo apt clean
+┌──(venv)─(kali㉿kali)-[~/Desktop/sbom-checker]
+└─$ cat /etc/apt/sources.list.d/kali.sources
+cat: /etc/apt/sources.list.d/kali.sources: No such file or directory
+                                                                                                                                                                                                                                           
+┌──(venv)─(kali㉿kali)-[~/Desktop/sbom-checker]
+└─$ sudo apt clean
 sudo rm -rf /var/lib/apt/lists/*
 sudo apt update
-
-И не закрывай этот терминал.
-
-Если sudo apt update прошёл без 404, проверь:
-
-sudo apt install -y \
-    git \
-    python3-dev \
-    python3-venv \
-    build-essential \
-    cmake \
-    pkg-config \
-    ninja-build \
-    llvm \
-    llvm-dev \
-    clang \
-    libffi-dev \
-    zlib1g-dev \
-    libzstd-dev \
-    jq \
-    file
-
-Kali — rolling-дистрибутив, поэтому несинхронизированные индексы/пакеты действительно могут создавать подобные проблемы; официальный troubleshooting первым делом рекомендует актуализировать APT metadata.
+[sudo] password for kali: 
+Get:1 https://packages.clickhouse.com/deb stable InRelease [3486 B]
+Get:2 https://packages.microsoft.com/debian/12/prod bookworm InRelease [3618 B]                                
+Err:2 https://packages.microsoft.com/debian/12/prod bookworm InRelease
+  Sub-process /usr/bin/sqv returned an error code (1), error message is: Signing key on BC528686B50D79E339D3721CEB3E94ADBE1229CF is not bound:            No binding signature at time 2026-08-15T23:24:44Z   because: Policy rejected non-revocation signature (PositiveCertification) requiring second pre-image resistance   because: SHA1 is not considered secure since 2026-02-01T00:00:00Z
+Get:4 https://packages.clickhouse.com/deb stable/main amd64 Packages [461 kB]
+Get:3 http://mirror1.sox.rs/kali/kali kali-rolling InRelease [34.0 kB]
+Err:3 http://mirror1.sox.rs/kali/kali kali-rolling InRelease
+  Sub-process /usr/bin/sqv returned an error code (1), error message is: Missing key 827C8569F2518CC677FECA1AED65462EC8D5E4C5, which is needed to verify signature.
+Warning: OpenPGP signature verification failed: https://packages.microsoft.com/debian/12/prod bookworm InRelease: Sub-process /usr/bin/sqv returned an error code (1), error message is: Signing key on BC528686B50D79E339D3721CEB3E94ADBE1229CF is not bound:            No binding signature at time 2026-08-15T23:24:44Z   because: Policy rejected non-revocation signature (PositiveCertification) requiring second pre-image resistance   because: SHA1 is not considered secure since 2026-02-01T00:00:00Z
+Error: The repository 'https://packages.microsoft.com/debian/12/prod bookworm InRelease' is not signed.
+Notice: Updating from such a repository can't be done securely, and is therefore disabled by default.
+Notice: See apt-secure(8) manpage for repository creation and user configuration details.
+Warning: OpenPGP signature verification failed: http://mirror1.sox.rs/kali/kali kali-rolling InRelease: Sub-process /usr/bin/sqv returned an error code (1), error message is: Missing key 827C8569F2518CC677FECA1AED65462EC8D5E4C5, which is needed to verify signature.
+Error: The repository 'http://http.kali.org/kali kali-rolling InRelease' is not signed.
+Notice: Updating from such a repository can't be done securely, and is therefore disabled by default.
+Notice: See apt-secure(8) manpage for repository creation and user configuration details.
+                                                                                                                                                                                                                                           
+┌──(venv)─(kali㉿kali)-[~/Desktop/sbom-checker]
