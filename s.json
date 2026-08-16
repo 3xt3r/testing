@@ -1,83 +1,57 @@
-SCAN_DIR="/home/kali/product_binaries" python - <<'PY'
-import os
-import json
-from pathlib import Path
-
+┌──(venv)─(kali㉿kali)-[~/Desktop/ptnad]
+└─$ SCAN_DIR="/home/kali/Desktop/pt" python - <<'PY'                                                                                                                                                         
+import os         
+import json                
+from pathlib import Path     
+    
 from cve_bin_tool.version_scanner import VersionScanner
-
+    
 root = os.environ["SCAN_DIR"]
-
-scanner = VersionScanner(
-    no_scan=True,
+        
+scanner = VersionScanner(    
+    no_scan=True,                
     should_extract=False,
     validate=False,
-)
+)                             
 
-found = {}
+found = {}         
 
-print(f"\nScanning: {root}\n")
+print(f"\nScanning: {root}\n")                            
 
 for result in scanner.recursive_scan(root):
-    if not result:
+    if not result: 
         continue
-
+    
     p = result.product_info
-
-    key = (
-        p.vendor,
-        p.product,
+        
+    key = (                          
+        p.vendor,                    
+        p.product,       
         p.version,
-        result.file_path,
-    )
+        result.file_path,           
+    )                                   
 
-    found[key] = {
+    found[key] = {       
         "vendor": p.vendor,
         "product": p.product,
-        "version": p.version,
+        "version": p.version,                        
         "path": result.file_path,
-    }
+    }                         
 
 results = list(found.values())
 
-print()
-print("=" * 100)
+print()                                        
+print("=" * 100)              
 print(f"{'VENDOR':20} {'PRODUCT':30} {'VERSION':20} PATH")
 print("=" * 100)
 
-for item in sorted(
-    results,
-    key=lambda x: (
-        x["product"],
+for item in sorted(        
+    results,    
+    key=lambda x: (                          
+        x["product"],             
         x["version"],
-        x["path"],
-    ),
-):
-    print(
-        f'{item["vendor"][:20]:20} '
-        f'{item["product"][:30]:30} '
-        f'{item["version"][:20]:20} '
-        f'{item["path"]}'
-    )
-
-output = Path("cve-bin-components.json")
-
-output.write_text(
-    json.dumps(
-        {
-            "scanner": "cve-bin-tool VersionScanner",
-            "mode": "component-detection-only",
-            "scan_root": root,
-            "components": results,
-        },
-        indent=2,
-        ensure_ascii=False,
-    ),
-    encoding="utf-8",
-)
-
-print()
-print("=" * 100)
-print(f"Detected components: {len(results)}")
-print(f"JSON: {output.resolve()}")
-print("=" * 100)
-PY
+        x["path"],                                                                                                                                                                                                                   <....
+Traceback (most recent call last):
+  File "<stdin>", line 9, in <module>
+TypeError: VersionScanner.__init__() got an unexpected keyword argument 'no_scan'
+                                                                                      
