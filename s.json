@@ -1,7 +1,2 @@
-ELF64
-    Compiler: Go(1.24.1)
-    Compiler: GCC(3.X)
-    Library: GLIBC(2.7)[EXEC AMD64-64]
-
-================================================================================
-
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      Symbols         FORTIFY Fortified       Fortifiable     FILE
+Partial RELRO   Canary found      NX enabled    No PIE          No RPATH   No RUNPATH   No Symbols        Yes   15              35              
