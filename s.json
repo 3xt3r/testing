@@ -1,17 +1,70 @@
-1. Исправляем Kali
+2. Посмотрим, где Microsoft repo прописан
+grep -Rni 'packages.microsoft.com' \
+  /etc/apt/sources.list \
+  /etc/apt/sources.list.d/ 2>/dev/null
 
-Выполни:
+Скорее всего увидишь что-то вроде:
 
-sudo wget https://archive.kali.org/archive-keyring.gpg \
-  -O /usr/share/keyrings/kali-archive-keyring.gpg
+/etc/apt/sources.list.d/microsoft-prod.list:...
 
-Проверь:
+Тогда временно отключи его:
 
-ls -lh /usr/share/keyrings/kali-archive-keyring.gpg
+sudo mv \
+  /etc/apt/sources.list.d/microsoft-prod.list \
+  /etc/apt/sources.list.d/microsoft-prod.list.disabled
 
-Затем:
+Если имя файла другое — используй то, которое покажет grep.
+
+После этого:
 
 sudo rm -rf /var/lib/apt/lists/*
 sudo apt update
 
-Официальная документация Kali приводит именно загрузку нового archive key как решение ошибки с ключом 827C8569F2518CC677FECA1AED65462EC8D5E4C5.
+Теперь нам нужен результат примерно без Error::
+
+Get: ... kali-rolling InRelease
+Get: ... kali-rolling/main ...
+Get: ... kali-rolling/contrib ...
+...
+Reading package lists... Done
+
+ClickHouse можешь пока оставить — по твоему выводу его repository успешно проверяется и Packages скачиваются.
+
+3. После успешного apt update
+
+Устанавливаем только необходимое:
+
+sudo apt install -y \
+  git \
+  python3-dev \
+  python3-venv \
+  build-essential \
+  cmake \
+  pkg-config \
+  ninja-build \
+  llvm \
+  llvm-dev \
+  clang \
+  libffi-dev \
+  zlib1g-dev \
+  libzstd-dev \
+  jq \
+  file
+
+И не запускай пока большой installer двойным кликом. Запусти его из того терминала, который сейчас открыт:
+
+cd ~/Desktop/sbom-checker
+
+
+bash ./install_blintdb.sh 2>&1 | tee ~/blint-install.log
+
+Тогда терминал в принципе никуда не исчезнет, даже если скрипт упадёт.
+
+Сейчас начни только с:
+
+sudo wget https://archive.kali.org/archive-keyring.gpg \
+  -O /usr/share/keyrings/kali-archive-keyring.gpg
+
+
+sudo rm -rf /var/lib/apt/lists/*
+sudo apt update
