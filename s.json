@@ -1,8 +1,71 @@
-sudo apt install -y llvm-19 llvm-19-dev clang-19 && \
-export NYXSTONE_LLVM_PREFIX=/usr/lib/llvm-19 && \
-export PATH="/usr/lib/llvm-19/bin:$PATH" && \
-export CC=/usr/lib/llvm-19/bin/clang && \
-export CXX=/usr/lib/llvm-19/bin/clang++ && \
-echo "LLVM for Nyxstone: $(llvm-config --version)" && \
-cd ~/blint-db && \
-pip install -e '.[extended]'
+Сначала собираем локальную базу zlib + bzip2 с function fingerprints:
+
+cd ~/blint-db
+
+
+export NYXSTONE_LLVM_PREFIX=/usr/lib/llvm-19
+export PATH="/usr/lib/llvm-19/bin:$PATH"
+export CC=/usr/lib/llvm-19/bin/clang
+export CXX=/usr/lib/llvm-19/bin/clang++
+export BLINT_DB_MESON_STRIP=0
+
+
+blint-db \
+  --db-file ./blint.db \
+  --clean-start \
+  --disassemble \
+  build-meson \
+  -s zlib bzip2
+
+Это официальный тестовый сценарий для маленького corpus.
+
+Потом подключаем локальную БД:
+
+export BLINTDB_HOME="$HOME/blint-db"
+
+Проверяем:
+
+python - <<'PY'
+from blint.config import BLINTDB_LOC
+print(BLINTDB_LOC)
+PY
+
+Должно быть:
+
+/home/kali/blint-db/blint.db
+
+Теперь тестируем на реальном бинарнике bzip2:
+
+blint sbom \
+  -i /usr/bin/bzip2 \
+  -o /tmp/bzip2.cdx.json \
+  --use-blintdb \
+  --deep
+
+При сочетании --use-blintdb --deep BLint автоматически включает disassembly, сначала пытается матчить function hashes, а затем fallback'ится на символы.
+
+Проверяем результат:
+
+ls -lh /tmp/bzip2.cdx.json
+
+и:
+
+jq -r '
+.components[] |
+[
+  .name,
+  (.version // "-"),
+  (.purl // "-")
+] |
+@tsv
+' /tmp/bzip2.cdx.json
+
+Если этот тест отработает, дальше уже можно сканировать целую директорию с бинарями:
+
+blint sbom \
+  -i /путь/к/распакованному/продукту \
+  -o /tmp/product.cdx.json \
+  --use-blintdb \
+  --deep
+
+Сейчас я бы сначала сделал именно /usr/bin/bzip2: это самый чистый способ проверить, что вся цепочка LLVM19 → Nyxstone → blint-db → BLint реально работает.
