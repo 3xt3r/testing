@@ -1,70 +1,275 @@
-2. Посмотрим, где Microsoft repo прописан
-grep -Rni 'packages.microsoft.com' \
-  /etc/apt/sources.list \
-  /etc/apt/sources.list.d/ 2>/dev/null
+blint_install() {
 
-Скорее всего увидишь что-то вроде:
+    echo
+    echo "============================================================"
+    echo " BLint + local blint-db installation"
+    echo "============================================================"
+    echo
 
-/etc/apt/sources.list.d/microsoft-prod.list:...
+    BLINT_DB_DIR="$HOME/blint-db"
 
-Тогда временно отключи его:
+    # --------------------------------------------------------
+    # 1. Проверяем необходимые системные команды
+    # --------------------------------------------------------
 
-sudo mv \
-  /etc/apt/sources.list.d/microsoft-prod.list \
-  /etc/apt/sources.list.d/microsoft-prod.list.disabled
+    echo "[1/7] Checking system dependencies..."
 
-Если имя файла другое — используй то, которое покажет grep.
+    for cmd in git python3 llvm-config clang cmake; do
+        if ! command -v "$cmd" >/dev/null 2>&1; then
+            echo
+            echo "[ERROR] Required command not found: $cmd"
+            echo
+            echo "APT packages are currently not installed/configured."
+            echo "Fix apt first, then repeat this block."
+            echo
+            return 1
+        fi
+    done
 
-После этого:
+    echo "[OK] git:         $(command -v git)"
+    echo "[OK] python3:     $(command -v python3)"
+    echo "[OK] llvm-config: $(command -v llvm-config)"
+    echo "[OK] clang:       $(command -v clang)"
+    echo
 
-sudo rm -rf /var/lib/apt/lists/*
-sudo apt update
+    LLVM_PREFIX="$(llvm-config --prefix)"
 
-Теперь нам нужен результат примерно без Error::
+    echo "[INFO] LLVM version: $(llvm-config --version)"
+    echo "[INFO] LLVM prefix:  $LLVM_PREFIX"
 
-Get: ... kali-rolling InRelease
-Get: ... kali-rolling/main ...
-Get: ... kali-rolling/contrib ...
-...
-Reading package lists... Done
+    export NYXSTONE_LLVM_PREFIX="$LLVM_PREFIX"
+    export PATH="$LLVM_PREFIX/bin:$PATH"
 
-ClickHouse можешь пока оставить — по твоему выводу его repository успешно проверяется и Packages скачиваются.
+    if [[ -x "$LLVM_PREFIX/bin/clang" ]]; then
+        export CC="$LLVM_PREFIX/bin/clang"
+    else
+        export CC="$(command -v clang)"
+    fi
 
-3. После успешного apt update
-
-Устанавливаем только необходимое:
-
-sudo apt install -y \
-  git \
-  python3-dev \
-  python3-venv \
-  build-essential \
-  cmake \
-  pkg-config \
-  ninja-build \
-  llvm \
-  llvm-dev \
-  clang \
-  libffi-dev \
-  zlib1g-dev \
-  libzstd-dev \
-  jq \
-  file
-
-И не запускай пока большой installer двойным кликом. Запусти его из того терминала, который сейчас открыт:
-
-cd ~/Desktop/sbom-checker
+    if [[ -x "$LLVM_PREFIX/bin/clang++" ]]; then
+        export CXX="$LLVM_PREFIX/bin/clang++"
+    elif command -v clang++ >/dev/null 2>&1; then
+        export CXX="$(command -v clang++)"
+    fi
 
 
-bash ./install_blintdb.sh 2>&1 | tee ~/blint-install.log
+    # --------------------------------------------------------
+    # 2. Python venv
+    # --------------------------------------------------------
 
-Тогда терминал в принципе никуда не исчезнет, даже если скрипт упадёт.
+    echo
+    echo "[2/7] Preparing Python environment..."
 
-Сейчас начни только с:
+    if [[ -n "${VIRTUAL_ENV:-}" ]]; then
 
-sudo wget https://archive.kali.org/archive-keyring.gpg \
-  -O /usr/share/keyrings/kali-archive-keyring.gpg
+        echo "[INFO] Using active venv:"
+        echo "       $VIRTUAL_ENV"
+
+    else
+
+        VENV_DIR="$HOME/blint-venv"
+
+        if [[ ! -d "$VENV_DIR" ]]; then
+            echo "[INFO] Creating:"
+            echo "       $VENV_DIR"
+
+            python3 -m venv "$VENV_DIR" || return 1
+        fi
+
+        # shellcheck disable=SC1090
+        source "$VENV_DIR/bin/activate"
+
+        echo "[INFO] Activated:"
+        echo "       $VIRTUAL_ENV"
+    fi
+
+    echo
+    python --version
+
+    python -m pip install --upgrade \
+        pip \
+        setuptools \
+        wheel || return 1
 
 
-sudo rm -rf /var/lib/apt/lists/*
-sudo apt update
+    # --------------------------------------------------------
+    # 3. BLint
+    # --------------------------------------------------------
+
+    echo
+    echo "[3/7] Installing BLint..."
+
+    python -m pip install -U 'blint[extended]' || return 1
+
+    echo
+    python -m pip show blint | grep -E '^(Name|Version|Location):' || true
+
+
+    # --------------------------------------------------------
+    # 4. blint-db repository
+    # --------------------------------------------------------
+
+    echo
+    echo "[4/7] Preparing blint-db..."
+
+    if [[ -d "$BLINT_DB_DIR/.git" ]]; then
+
+        echo "[INFO] Existing repository:"
+        echo "       $BLINT_DB_DIR"
+
+        cd "$BLINT_DB_DIR" || return 1
+
+        git fetch --all --prune || true
+
+    else
+
+        if [[ -e "$BLINT_DB_DIR" ]]; then
+            echo
+            echo "[ERROR] $BLINT_DB_DIR exists but is not a git repository."
+            return 1
+        fi
+
+        git clone \
+            https://github.com/AppThreat/blint-db.git \
+            "$BLINT_DB_DIR" || return 1
+
+        cd "$BLINT_DB_DIR" || return 1
+    fi
+
+
+    # --------------------------------------------------------
+    # 5. Install blint-db + Nyxstone
+    # --------------------------------------------------------
+
+    echo
+    echo "[5/7] Installing blint-db + Nyxstone..."
+
+    export NYXSTONE_LLVM_PREFIX="$LLVM_PREFIX"
+    export PATH="$LLVM_PREFIX/bin:$PATH"
+
+    echo
+    echo "NYXSTONE_LLVM_PREFIX=$NYXSTONE_LLVM_PREFIX"
+    echo "LLVM=$(llvm-config --version)"
+    echo
+
+    python -m pip install -e '.[extended]' || return 1
+
+    if ! command -v blint-db >/dev/null 2>&1; then
+        echo
+        echo "[ERROR] blint-db command was not installed."
+        return 1
+    fi
+
+    echo
+    echo "[OK] blint-db:"
+    command -v blint-db
+
+
+    # --------------------------------------------------------
+    # 6. Build local database
+    # --------------------------------------------------------
+
+    echo
+    echo "[6/7] Building LOCAL blint.db..."
+    echo
+    echo "Projects:"
+    echo "  - zlib"
+    echo "  - bzip2"
+    echo
+
+    cd "$BLINT_DB_DIR" || return 1
+
+    export BLINT_DB_MESON_STRIP=0
+
+    rm -f \
+        "$BLINT_DB_DIR/blint.db-wal" \
+        "$BLINT_DB_DIR/blint.db-shm"
+
+    blint-db \
+        --db-file "$BLINT_DB_DIR/blint.db" \
+        --clean-start \
+        --disassemble \
+        build-meson \
+        -s zlib bzip2 || return 1
+
+
+    # --------------------------------------------------------
+    # 7. Activate local database
+    # --------------------------------------------------------
+
+    echo
+    echo "[7/7] Activating local database..."
+
+    if [[ ! -s "$BLINT_DB_DIR/blint.db" ]]; then
+        echo
+        echo "[ERROR] blint.db was not created."
+        return 1
+    fi
+
+    export BLINTDB_HOME="$BLINT_DB_DIR"
+
+    cat > "$HOME/.blintdb_env" <<EOF
+export BLINTDB_HOME="$BLINT_DB_DIR"
+export NYXSTONE_LLVM_PREFIX="$LLVM_PREFIX"
+export PATH="$LLVM_PREFIX/bin:\$PATH"
+EOF
+
+    echo
+    echo "============================================================"
+    echo " SUCCESS"
+    echo "============================================================"
+    echo
+
+    echo "Database:"
+    ls -lh "$BLINT_DB_DIR/blint.db"
+
+    echo
+    echo "BLINTDB_HOME=$BLINTDB_HOME"
+
+    echo
+    echo "BLint sees:"
+    python - <<'PY'
+from blint.config import BLINTDB_LOC
+print(BLINTDB_LOC)
+PY
+
+    echo
+    echo "For a new terminal use:"
+    echo
+    echo "  source ~/.blintdb_env"
+    echo
+
+    echo "Test scan:"
+    echo
+    echo '  blint sbom \'
+    echo '      -i /usr/bin/bzip2 \'
+    echo '      -o /tmp/bzip2.cdx.json \'
+    echo '      --use-blintdb \'
+    echo '      --deep'
+    echo
+
+    echo "IMPORTANT:"
+    echo "  Do NOT run: blint db --download"
+    echo "  We are using the local database."
+    echo
+
+    return 0
+}
+
+blint_install
+BLINT_RESULT=$?
+
+echo
+echo "============================================================"
+
+if [[ "$BLINT_RESULT" -eq 0 ]]; then
+    echo "Installation completed."
+else
+    echo "Installation failed with code: $BLINT_RESULT"
+fi
+
+echo "Terminal remains open."
+echo "============================================================"
+echo
+
+unset -f blint_install
