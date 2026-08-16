@@ -1,275 +1,39 @@
-blint_install() {
-
-    echo
-    echo "============================================================"
-    echo " BLint + local blint-db installation"
-    echo "============================================================"
-    echo
-
-    BLINT_DB_DIR="$HOME/blint-db"
-
-    # --------------------------------------------------------
-    # 1. Проверяем необходимые системные команды
-    # --------------------------------------------------------
-
-    echo "[1/7] Checking system dependencies..."
-
-    for cmd in git python3 llvm-config clang cmake; do
-        if ! command -v "$cmd" >/dev/null 2>&1; then
-            echo
-            echo "[ERROR] Required command not found: $cmd"
-            echo
-            echo "APT packages are currently not installed/configured."
-            echo "Fix apt first, then repeat this block."
-            echo
-            return 1
-        fi
-    done
-
-    echo "[OK] git:         $(command -v git)"
-    echo "[OK] python3:     $(command -v python3)"
-    echo "[OK] llvm-config: $(command -v llvm-config)"
-    echo "[OK] clang:       $(command -v clang)"
-    echo
-
-    LLVM_PREFIX="$(llvm-config --prefix)"
-
-    echo "[INFO] LLVM version: $(llvm-config --version)"
-    echo "[INFO] LLVM prefix:  $LLVM_PREFIX"
-
-    export NYXSTONE_LLVM_PREFIX="$LLVM_PREFIX"
-    export PATH="$LLVM_PREFIX/bin:$PATH"
-
-    if [[ -x "$LLVM_PREFIX/bin/clang" ]]; then
-        export CC="$LLVM_PREFIX/bin/clang"
-    else
-        export CC="$(command -v clang)"
-    fi
-
-    if [[ -x "$LLVM_PREFIX/bin/clang++" ]]; then
-        export CXX="$LLVM_PREFIX/bin/clang++"
-    elif command -v clang++ >/dev/null 2>&1; then
-        export CXX="$(command -v clang++)"
-    fi
-
-
-    # --------------------------------------------------------
-    # 2. Python venv
-    # --------------------------------------------------------
-
-    echo
-    echo "[2/7] Preparing Python environment..."
-
-    if [[ -n "${VIRTUAL_ENV:-}" ]]; then
-
-        echo "[INFO] Using active venv:"
-        echo "       $VIRTUAL_ENV"
-
-    else
-
-        VENV_DIR="$HOME/blint-venv"
-
-        if [[ ! -d "$VENV_DIR" ]]; then
-            echo "[INFO] Creating:"
-            echo "       $VENV_DIR"
-
-            python3 -m venv "$VENV_DIR" || return 1
-        fi
-
-        # shellcheck disable=SC1090
-        source "$VENV_DIR/bin/activate"
-
-        echo "[INFO] Activated:"
-        echo "       $VIRTUAL_ENV"
-    fi
-
-    echo
-    python --version
-
-    python -m pip install --upgrade \
-        pip \
-        setuptools \
-        wheel || return 1
-
-
-    # --------------------------------------------------------
-    # 3. BLint
-    # --------------------------------------------------------
-
-    echo
-    echo "[3/7] Installing BLint..."
-
-    python -m pip install -U 'blint[extended]' || return 1
-
-    echo
-    python -m pip show blint | grep -E '^(Name|Version|Location):' || true
-
-
-    # --------------------------------------------------------
-    # 4. blint-db repository
-    # --------------------------------------------------------
-
-    echo
-    echo "[4/7] Preparing blint-db..."
-
-    if [[ -d "$BLINT_DB_DIR/.git" ]]; then
-
-        echo "[INFO] Existing repository:"
-        echo "       $BLINT_DB_DIR"
-
-        cd "$BLINT_DB_DIR" || return 1
-
-        git fetch --all --prune || true
-
-    else
-
-        if [[ -e "$BLINT_DB_DIR" ]]; then
-            echo
-            echo "[ERROR] $BLINT_DB_DIR exists but is not a git repository."
-            return 1
-        fi
-
-        git clone \
-            https://github.com/AppThreat/blint-db.git \
-            "$BLINT_DB_DIR" || return 1
-
-        cd "$BLINT_DB_DIR" || return 1
-    fi
-
-
-    # --------------------------------------------------------
-    # 5. Install blint-db + Nyxstone
-    # --------------------------------------------------------
-
-    echo
-    echo "[5/7] Installing blint-db + Nyxstone..."
-
-    export NYXSTONE_LLVM_PREFIX="$LLVM_PREFIX"
-    export PATH="$LLVM_PREFIX/bin:$PATH"
-
-    echo
-    echo "NYXSTONE_LLVM_PREFIX=$NYXSTONE_LLVM_PREFIX"
-    echo "LLVM=$(llvm-config --version)"
-    echo
-
-    python -m pip install -e '.[extended]' || return 1
-
-    if ! command -v blint-db >/dev/null 2>&1; then
-        echo
-        echo "[ERROR] blint-db command was not installed."
-        return 1
-    fi
-
-    echo
-    echo "[OK] blint-db:"
-    command -v blint-db
-
-
-    # --------------------------------------------------------
-    # 6. Build local database
-    # --------------------------------------------------------
-
-    echo
-    echo "[6/7] Building LOCAL blint.db..."
-    echo
-    echo "Projects:"
-    echo "  - zlib"
-    echo "  - bzip2"
-    echo
-
-    cd "$BLINT_DB_DIR" || return 1
-
-    export BLINT_DB_MESON_STRIP=0
-
-    rm -f \
-        "$BLINT_DB_DIR/blint.db-wal" \
-        "$BLINT_DB_DIR/blint.db-shm"
-
-    blint-db \
-        --db-file "$BLINT_DB_DIR/blint.db" \
-        --clean-start \
-        --disassemble \
-        build-meson \
-        -s zlib bzip2 || return 1
-
-
-    # --------------------------------------------------------
-    # 7. Activate local database
-    # --------------------------------------------------------
-
-    echo
-    echo "[7/7] Activating local database..."
-
-    if [[ ! -s "$BLINT_DB_DIR/blint.db" ]]; then
-        echo
-        echo "[ERROR] blint.db was not created."
-        return 1
-    fi
-
-    export BLINTDB_HOME="$BLINT_DB_DIR"
-
-    cat > "$HOME/.blintdb_env" <<EOF
-export BLINTDB_HOME="$BLINT_DB_DIR"
-export NYXSTONE_LLVM_PREFIX="$LLVM_PREFIX"
-export PATH="$LLVM_PREFIX/bin:\$PATH"
-EOF
-
-    echo
-    echo "============================================================"
-    echo " SUCCESS"
-    echo "============================================================"
-    echo
-
-    echo "Database:"
-    ls -lh "$BLINT_DB_DIR/blint.db"
-
-    echo
-    echo "BLINTDB_HOME=$BLINTDB_HOME"
-
-    echo
-    echo "BLint sees:"
-    python - <<'PY'
-from blint.config import BLINTDB_LOC
-print(BLINTDB_LOC)
-PY
-
-    echo
-    echo "For a new terminal use:"
-    echo
-    echo "  source ~/.blintdb_env"
-    echo
-
-    echo "Test scan:"
-    echo
-    echo '  blint sbom \'
-    echo '      -i /usr/bin/bzip2 \'
-    echo '      -o /tmp/bzip2.cdx.json \'
-    echo '      --use-blintdb \'
-    echo '      --deep'
-    echo
-
-    echo "IMPORTANT:"
-    echo "  Do NOT run: blint db --download"
-    echo "  We are using the local database."
-    echo
-
-    return 0
-}
-
-blint_install
-BLINT_RESULT=$?
-
-echo
-echo "============================================================"
-
-if [[ "$BLINT_RESULT" -eq 0 ]]; then
-    echo "Installation completed."
-else
-    echo "Installation failed with code: $BLINT_RESULT"
-fi
-
-echo "Terminal remains open."
-echo "============================================================"
-echo
-
-unset -f blint_install
+NYXSTONE_LLVM_PREFIX=/usr/lib/llvm-21
+LLVM=21.1.8
+
+Obtaining file:///home/kali/blint-db
+  Installing build dependencies ... done
+  Checking if build backend supports build_editable ... done
+  Getting requirements to build editable ... done
+  Preparing editable metadata (pyproject.toml) ... done
+Requirement already satisfied: blint in /home/kali/Desktop/ptnad/venv/lib/python3.14/site-packages (from blint-db==2.0.0) (3.2.4)
+Collecting conan>=2.28.0 (from blint-db==2.0.0)
+  Downloading conan-2.31.2-py3-none-any.whl.metadata (8.6 kB)
+Collecting huggingface-hub>=1.12.2 (from blint-db==2.0.0)
+  Downloading huggingface_hub-1.27.0-py3-none-any.whl.metadata (16 kB)
+Collecting meson>=1.11.1 (from blint-db==2.0.0)
+  Downloading meson-1.12.0-py3-none-any.whl.metadata (1.7 kB)
+Collecting ninja>=1.13.0 (from blint-db==2.0.0)
+  Downloading ninja-1.13.0-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (5.1 kB)
+Requirement already satisfied: oras>=0.2.42 in /home/kali/Desktop/ptnad/venv/lib/python3.14/site-packages (from blint-db==2.0.0) (0.2.43)
+Collecting nyxstone>=0.1.1 (from blint-db==2.0.0)
+  Downloading nyxstone-0.1.8.tar.gz (38 kB)
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... error
+  error: subprocess-exited-with-error
+  
+  × Getting requirements to build wheel did not run successfully.
+  │ exit code: 1
+  ╰─> [1 lines of output]
+      LLVM Major version must be in the range 15-20, found 21! Set the environment variable $NYXSTONE_LLVM_PREFIX to tell nyxstone about the install location of LLVM.
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+ERROR: Failed to build 'nyxstone' when getting requirements to build wheel
+                                                                                                                                                                                                                                           
+============================================================
+Installation failed with code: 1
+Terminal remains open.
+============================================================
+
+                                          
