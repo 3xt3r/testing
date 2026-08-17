@@ -1,0 +1,291 @@
+{
+  "name": "Suricata binary evidence dictionary",
+  "purpose": "Heuristic identification of Suricata or Suricata-derived code in stripped binaries",
+  "notes": [
+    "A hit is evidence, not proof of code provenance.",
+    "Prefer matches from multiple categories.",
+    "Do not add Suricata to an SBOM solely because the generic word 'suricata' is present.",
+    "For an SBOM, try to recover a version or establish provenance separately."
+  ],
+  "signatures": [
+    {
+      "pattern": "redmine.openinfosecfoundation.org/projects/suricata",
+      "category": "project_identity",
+      "weight": 100
+    },
+    {
+      "pattern": "openinfosecfoundation.org",
+      "category": "project_identity",
+      "weight": 70
+    },
+    {
+      "pattern": "Open Information Security Foundation",
+      "category": "project_identity",
+      "weight": 80
+    },
+    {
+      "pattern": "suricata.io",
+      "category": "project_identity",
+      "weight": 55
+    },
+    {
+      "pattern": "suricata.yaml",
+      "category": "project_identity",
+      "weight": 45
+    },
+    {
+      "pattern": "suricata.log",
+      "category": "project_identity",
+      "weight": 35
+    },
+    {
+      "pattern": "suricata-update",
+      "category": "project_identity",
+      "weight": 30
+    },
+    {
+      "pattern": "suricata",
+      "category": "generic",
+      "weight": 5
+    },
+    {
+      "pattern": "eve.json",
+      "category": "suricata_config_output",
+      "weight": 8
+    },
+    {
+      "pattern": "fast.log",
+      "category": "suricata_config_output",
+      "weight": 8
+    },
+    {
+      "pattern": "stats.log",
+      "category": "suricata_config_output",
+      "weight": 8
+    },
+    {
+      "pattern": "alert-debug.log",
+      "category": "suricata_config_output",
+      "weight": 14
+    },
+    {
+      "pattern": "rules_fast_pattern.txt",
+      "category": "suricata_config_output",
+      "weight": 25
+    },
+    {
+      "pattern": "rules_analysis.txt",
+      "category": "suricata_config_output",
+      "weight": 25
+    },
+    {
+      "pattern": "classification.config",
+      "category": "suricata_config_output",
+      "weight": 8
+    },
+    {
+      "pattern": "reference.config",
+      "category": "suricata_config_output",
+      "weight": 8
+    },
+    {
+      "pattern": "threshold.config",
+      "category": "suricata_config_output",
+      "weight": 8
+    },
+    {
+      "pattern": "default-rule-path",
+      "category": "suricata_config_output",
+      "weight": 7
+    },
+    {
+      "pattern": "rule-files",
+      "category": "suricata_config_output",
+      "weight": 5
+    },
+    {
+      "pattern": "eve-log",
+      "category": "suricata_config_output",
+      "weight": 5
+    },
+    {
+      "pattern": "pcap-log",
+      "category": "suricata_config_output",
+      "weight": 5
+    },
+    {
+      "pattern": "detect-engine",
+      "category": "suricata_internal",
+      "weight": 10
+    },
+    {
+      "pattern": "detect-app-layer",
+      "category": "suricata_internal",
+      "weight": 13
+    },
+    {
+      "pattern": "detect-app-layer-protocol",
+      "category": "suricata_internal",
+      "weight": 18
+    },
+    {
+      "pattern": "detect-app-layer-event",
+      "category": "suricata_internal",
+      "weight": 18
+    },
+    {
+      "pattern": "app-layer-parser",
+      "category": "suricata_internal",
+      "weight": 14
+    },
+    {
+      "pattern": "app-layer-detect-proto",
+      "category": "suricata_internal",
+      "weight": 20
+    },
+    {
+      "pattern": "app-layer-htp",
+      "category": "suricata_internal",
+      "weight": 15
+    },
+    {
+      "pattern": "stream-tcp",
+      "category": "suricata_internal",
+      "weight": 8
+    },
+    {
+      "pattern": "stream-tcp-reassemble",
+      "category": "suricata_internal",
+      "weight": 15
+    },
+    {
+      "pattern": "tmqh-packetpool",
+      "category": "suricata_internal",
+      "weight": 22
+    },
+    {
+      "pattern": "runmode-af-packet",
+      "category": "suricata_internal",
+      "weight": 20
+    },
+    {
+      "pattern": "source-af-packet",
+      "category": "suricata_internal",
+      "weight": 16
+    },
+    {
+      "pattern": "source-pcap-file",
+      "category": "suricata_internal",
+      "weight": 12
+    },
+    {
+      "pattern": "source-dpdk",
+      "category": "suricata_internal",
+      "weight": 15
+    },
+    {
+      "pattern": "runmode-netmap",
+      "category": "suricata_internal",
+      "weight": 16
+    },
+    {
+      "pattern": "source-netmap",
+      "category": "suricata_internal",
+      "weight": 14
+    },
+    {
+      "pattern": "util-mpm-hs",
+      "category": "suricata_internal",
+      "weight": 18
+    },
+    {
+      "pattern": "detect-engine-mpm",
+      "category": "suricata_internal",
+      "weight": 15
+    },
+    {
+      "pattern": "detect-engine-siggroup",
+      "category": "suricata_internal",
+      "weight": 15
+    },
+    {
+      "pattern": "detect-engine-state",
+      "category": "suricata_internal",
+      "weight": 14
+    },
+    {
+      "pattern": "detect-engine-build",
+      "category": "suricata_internal",
+      "weight": 14
+    },
+    {
+      "pattern": "detect-engine-analyzer",
+      "category": "suricata_internal",
+      "weight": 18
+    },
+    {
+      "pattern": "app-layer-protos",
+      "category": "suricata_internal",
+      "weight": 10
+    },
+    {
+      "pattern": "app-layer-event",
+      "category": "suricata_internal",
+      "weight": 8
+    },
+    {
+      "pattern": "filemagic",
+      "category": "suricata_rule_keyword",
+      "weight": 5
+    },
+    {
+      "pattern": "detection_filter",
+      "category": "suricata_rule_keyword",
+      "weight": 4
+    },
+    {
+      "pattern": "libhtp",
+      "category": "supporting_library",
+      "weight": 6
+    },
+    {
+      "pattern": "hyperscan",
+      "category": "supporting_library",
+      "weight": 4
+    },
+    {
+      "pattern": "pfring",
+      "category": "supporting_library",
+      "weight": 3
+    },
+    {
+      "pattern": "pf_ring",
+      "category": "supporting_library",
+      "weight": 3
+    },
+    {
+      "pattern": "af-packet",
+      "category": "supporting_library",
+      "weight": 3
+    },
+    {
+      "pattern": "dpdk",
+      "category": "supporting_library",
+      "weight": 2
+    },
+    {
+      "pattern": "netmap",
+      "category": "supporting_library",
+      "weight": 2
+    }
+  ],
+  "version_regexes": [
+    "(?i)\\bSuricata(?:\\s+version)?\\s*[:=/ -]?\\s*v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b",
+    "(?i)\\bsuricata[-_/ ]v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b"
+  ],
+  "confidence_guidance": {
+    "strong": "Direct project marker, or score >= 80 with evidence from at least 2 categories",
+    "medium": "Score >= 40 with evidence from at least 2 categories",
+    "weak": "Everything else; do not use alone as SBOM proof"
+  }
+}
