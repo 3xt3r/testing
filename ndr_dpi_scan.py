@@ -178,6 +178,23 @@ def scan_path(target, db, include_traces=False):
         text=is_probably_text(path)
         elf=is_elf(path)
 
+        # File/path evidence matters when scanning an unpacked product tree.
+        # It lets us identify shipped .so files, source-tree markers and firmware
+        # whose own binary content may not contain the project/file name.
+        path_text=str(path)
+        base_name=path.name
+        for c in db["components"]:
+            for pat in c.get("library_patterns",[]):
+                if fnmatch.fnmatch(base_name.lower(),pat.lower()):
+                    add_ev(findings,c["name"],"artifact_file",70,base_name,path,"FILE_NAME",path_text)
+                    findings[c["name"]]["files"].add(str(path))
+        if literal_rx:
+            for m in literal_rx.finditer(path_text):
+                for comp,kind,weight,canonical in literal_idx.get(m.group(0).lower(),[]):
+                    if kind in ("source_marker","project_marker"):
+                        add_ev(findings,comp,"path_"+kind,min(90,weight+10),canonical,path,"FILE_PATH",path_text)
+                        findings[comp]["files"].add(str(path))
+
         if elf or (not text and size>0):
             binaries_scanned += 1
             deps=get_needed(path)
@@ -246,10 +263,10 @@ def scan_path(target, db, include_traces=False):
                 pass
 
     caps={
-        "dynamic_library":100,
-        "project_marker":100,"source_project_marker":100,
+        "dynamic_library":100,"artifact_file":90,
+        "project_marker":100,"source_project_marker":100,"path_project_marker":100,
         "function":120,"source_function":140,"dynamic_symbol":140,
-        "source_marker":90,"source_source_marker":110,
+        "source_marker":90,"source_source_marker":110,"path_source_marker":100,
         "string":40,"source_string":50,
         "version":40
     }
@@ -262,7 +279,10 @@ def scan_path(target, db, include_traces=False):
         for e in f["evidence"]:
             sums[e["kind"]]+=e["weight"]
             nk=e["kind"].replace("source_","")
+            if nk.startswith("path_"):
+                nk=nk[len("path_"):]
             if nk=="dynamic_symbol": nk="function"
+            if nk=="artifact_file": nk="artifact"
             normalized.add(nk)
             has_dynamic |= e["kind"]=="dynamic_library"
         score=min(300,sum(min(v,caps.get(k,80)) for k,v in sums.items()))

@@ -56,33 +56,51 @@
     {
       "name": "zeek",
       "aliases": [
-        "bro"
+        "bro",
+        "bro-ids",
+        "zeek-core"
       ],
       "category": "network_security_monitor",
-      "description_ru": "Система сетевого мониторинга и анализа протоколов, ранее Bro.",
+      "description_ru": "Zeek network analysis/security monitoring framework, historically named Bro.",
       "specificity": 97,
       "library_patterns": [
         "libzeek.so*"
       ],
       "project_markers": [
         "The Zeek Network Security Monitor",
+        "Zeek Network Security Monitor",
+        "Bro Network Security Monitor",
         "zeek.org",
-        "Bro Network Security Monitor"
+        "bro.org"
       ],
       "functions": [
-        "zeek::",
-        "BroString",
-        "Analyzer::",
-        "Connection::"
+        "zeek::run_state::",
+        "zeek::detail::",
+        "zeek::analyzer::Analyzer",
+        "zeek::Connection",
+        "zeek::Val",
+        "zeek_init",
+        "zeek_done"
       ],
       "strings": [
         "BinPAC::",
         "zeek_init",
         "zeek_done",
+        "conn.log",
+        "notice.log",
+        "weird.log",
         "analyzer.log",
-        "conn.log"
+        "protocols/conn",
+        "base/frameworks/notice"
       ],
-      "source_markers": [],
+      "source_markers": [
+        "src/zeek.cc",
+        "src/NetVar.cc",
+        "src/Conn.cc",
+        "src/analyzer/Manager.cc",
+        "scripts/base/frameworks/",
+        "scripts/base/protocols/"
+      ],
       "version_regex": [
         "(?i)\\b(?:Zeek|Bro)\\s+(?:version\\s+)?v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b"
       ]
@@ -327,22 +345,41 @@
     },
     {
       "name": "p0f",
-      "aliases": [],
+      "aliases": [
+        "p0f-client"
+      ],
       "category": "fingerprinting",
-      "description_ru": "Пассивный fingerprinting ОС/сетевых стеков.",
+      "description_ru": "Passive OS/network stack fingerprinting tool.",
       "specificity": 87,
       "library_patterns": [],
       "project_markers": [
         "p0f - passive os fingerprinting tool",
+        "Passive OS Fingerprinting Tool",
         "p0f.fp"
       ],
       "functions": [],
       "strings": [
+        "p0f.fp",
+        "p0fa.fp",
+        "p0fr.fp",
+        "p0f-client",
+        "p0f-query",
         "sys =",
-        "label ="
+        "label =",
+        "sig =",
+        "classes ="
       ],
-      "source_markers": [],
-      "version_regex": []
+      "source_markers": [
+        "p0f.c",
+        "process.c",
+        "fp_tcp.c",
+        "fp_http.c",
+        "fp_mtu.c",
+        "api.c"
+      ],
+      "version_regex": [
+        "(?i)\\bp0f\\s+v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b"
+      ]
     },
     {
       "name": "ssdeep",
@@ -1692,42 +1729,85 @@
     },
     {
       "name": "cppzmq",
-      "aliases": [],
+      "aliases": [
+        "zmq.hpp",
+        "zmq_addon.hpp"
+      ],
       "category": "messaging",
-      "description_ru": "Header-only C++ binding для ZeroMQ.",
-      "specificity": 20,
+      "description_ru": "Header-only C++ binding for libzmq/ZeroMQ.",
+      "specificity": 58,
       "library_patterns": [],
       "project_markers": [
-        "cppzmq"
+        "cppzmq",
+        "zeromq/cppzmq"
       ],
-      "functions": [],
-      "strings": [
+      "functions": [
         "zmq::context_t",
-        "zmq::socket_t"
+        "zmq::socket_t",
+        "zmq::message_t",
+        "zmq::multipart_t",
+        "zmq::poller_t"
       ],
-      "source_markers": [],
-      "version_regex": []
+      "strings": [
+        "zmq::sockopt::",
+        "zmq::send_flags::",
+        "zmq::recv_flags::",
+        "zmq::socket_type::",
+        "zmq::error_t"
+      ],
+      "source_markers": [
+        "zmq.hpp",
+        "zmq_addon.hpp"
+      ],
+      "version_regex": [
+        "(?i)\\bcppzmq\\s+v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b"
+      ]
     },
     {
       "name": "rabbitmq-c",
-      "aliases": [],
+      "aliases": [
+        "librabbitmq",
+        "rabbitmq_c"
+      ],
       "category": "messaging",
-      "description_ru": "C AMQP client library.",
-      "specificity": 26,
+      "description_ru": "C-language AMQP client library for RabbitMQ.",
+      "specificity": 54,
       "library_patterns": [
         "librabbitmq.so*"
       ],
       "project_markers": [
-        "rabbitmq-c"
+        "rabbitmq-c",
+        "alanxz/rabbitmq-c",
+        "RabbitMQ C client"
       ],
       "functions": [
         "amqp_new_connection",
+        "amqp_tcp_socket_new",
+        "amqp_ssl_socket_new",
         "amqp_socket_open",
-        "amqp_basic_publish"
+        "amqp_login",
+        "amqp_channel_open",
+        "amqp_queue_declare",
+        "amqp_basic_publish",
+        "amqp_basic_consume",
+        "amqp_consume_message",
+        "amqp_destroy_connection"
       ],
-      "strings": [],
-      "source_markers": [],
-      "version_regex": []
+      "strings": [
+        "AMQP_STATUS_",
+        "AMQP_RESPONSE_",
+        "AMQP_SASL_METHOD_",
+        "amqp_connection_state_t"
+      ],
+      "source_markers": [
+        "librabbitmq/amqp.h",
+        "librabbitmq/amqp_framing.h",
+        "librabbitmq/amqp_tcp_socket.c",
+        "librabbitmq/amqp_socket.c"
+      ],
+      "version_regex": [
+        "(?i)\\brabbitmq-c\\s+v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b"
+      ]
     },
     {
       "name": "librdkafka",
@@ -2020,41 +2100,88 @@
     },
     {
       "name": "dmlc-core",
-      "aliases": [],
+      "aliases": [
+        "dmlc"
+      ],
       "category": "ml_analytics",
-      "description_ru": "Базовая C++ library экосистемы DMLC/XGBoost.",
-      "specificity": 30,
+      "description_ru": "Core C++ utilities used by DMLC/XGBoost: logging, I/O, JSON, parameters, registry and distributed ML support.",
+      "specificity": 61,
       "library_patterns": [],
       "project_markers": [
         "dmlc-core",
-        "dmlc::"
+        "dmlc/dmlc-core"
       ],
-      "functions": [],
+      "functions": [
+        "dmlc::Stream::Create",
+        "dmlc::InputSplit::Create",
+        "dmlc::RecordIOWriter",
+        "dmlc::RecordIOReader",
+        "dmlc::JSONReader",
+        "dmlc::JSONWriter",
+        "dmlc::TemporaryDirectory",
+        "dmlc::ThreadLocalStore"
+      ],
       "strings": [
         "dmlc::Stream",
-        "dmlc::Parameter"
+        "dmlc::Parameter",
+        "dmlc::Registry",
+        "DMLC_LOG_BEFORE_THROW",
+        "DMLC_TRACKER_URI",
+        "DMLC_TRACKER_PORT"
       ],
-      "source_markers": [],
-      "version_regex": []
+      "source_markers": [
+        "dmlc-core/include/dmlc/base.h",
+        "dmlc-core/include/dmlc/logging.h",
+        "dmlc-core/include/dmlc/io.h",
+        "dmlc-core/include/dmlc/json.h",
+        "dmlc-core/include/dmlc/parameter.h",
+        "dmlc-core/include/dmlc/registry.h"
+      ],
+      "version_regex": [
+        "(?i)\\bdmlc-core\\s+v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b"
+      ]
     },
     {
       "name": "rabit",
-      "aliases": [],
+      "aliases": [
+        "librabit"
+      ],
       "category": "ml_analytics",
-      "description_ru": "Collective communication library из экосистемы XGBoost.",
-      "specificity": 38,
-      "library_patterns": [],
+      "description_ru": "Reliable Allreduce and Broadcast Interface; distributed collective communication library historically used by XGBoost.",
+      "specificity": 68,
+      "library_patterns": [
+        "librabit.so*"
+      ],
       "project_markers": [
-        "rabit"
+        "Reliable Allreduce and Broadcast Interface",
+        "dmlc/rabit"
       ],
       "functions": [
         "rabit::Init",
         "rabit::Finalize",
-        "rabit::Allreduce"
+        "rabit::GetRank",
+        "rabit::GetWorldSize",
+        "rabit::Allreduce",
+        "rabit::Broadcast",
+        "rabit::CheckPoint",
+        "rabit::LoadCheckPoint",
+        "rabit::TrackerPrint"
       ],
-      "strings": [],
-      "source_markers": [],
-      "version_regex": []
+      "strings": [
+        "RABIT_",
+        "DMLC_TRACKER_URI",
+        "DMLC_TRACKER_PORT",
+        "rabit::engine::"
+      ],
+      "source_markers": [
+        "rabit/include/rabit/rabit.h",
+        "rabit/include/rabit/base.h",
+        "rabit/src/allreduce_base.h",
+        "rabit/src/engine.cc"
+      ],
+      "version_regex": [
+        "(?i)\\brabit\\s+v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b"
+      ]
     },
     {
       "name": "lightgbm",
@@ -2221,22 +2348,54 @@
     },
     {
       "name": "poco",
-      "aliases": [],
+      "aliases": [
+        "POCO",
+        "libpoco"
+      ],
       "category": "cpp_infrastructure",
-      "description_ru": "C++ libraries для networking/HTTP/threading/filesystem.",
-      "specificity": 12,
+      "description_ru": "POCO Portable Components C++ libraries for networking, HTTP, filesystem, threading and server applications.",
+      "specificity": 34,
       "library_patterns": [
+        "libPocoFoundation.so*",
+        "libPocoNet.so*",
+        "libPocoNetSSL.so*",
+        "libPocoUtil.so*",
+        "libPocoJSON.so*",
+        "libPocoXML.so*",
+        "libPocoData*.so*",
         "libPoco*.so*"
       ],
       "project_markers": [
-        "POCO C++ Libraries"
+        "POCO C++ Libraries",
+        "Portable Components C++ Libraries",
+        "pocoproject/poco"
       ],
-      "functions": [],
+      "functions": [
+        "Poco::Foundation",
+        "Poco::Net::HTTPClientSession",
+        "Poco::Net::HTTPServer",
+        "Poco::Net::Socket",
+        "Poco::Util::Application",
+        "Poco::JSON::Parser",
+        "Poco::Logger"
+      ],
       "strings": [
-        "Poco::"
+        "Poco::Net::",
+        "Poco::Util::",
+        "Poco::JSON::",
+        "Poco::XML::",
+        "Poco::Data::"
       ],
-      "source_markers": [],
-      "version_regex": []
+      "source_markers": [
+        "Foundation/src/",
+        "Net/src/",
+        "Util/src/",
+        "JSON/src/",
+        "XML/src/"
+      ],
+      "version_regex": [
+        "(?i)\\bPOCO\\s+(?:C\\+\\+\\s+Libraries\\s+)?v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b"
+      ]
     },
     {
       "name": "gflags",
@@ -2329,24 +2488,52 @@
     },
     {
       "name": "jansson",
-      "aliases": [],
+      "aliases": [
+        "libjansson4",
+        "libjansson",
+        "libjasson4",
+        "jasson"
+      ],
       "category": "structured_data",
-      "description_ru": "C JSON library.",
-      "specificity": 10,
+      "description_ru": "Jansson C library for encoding, decoding and manipulating JSON data.",
+      "specificity": 49,
       "library_patterns": [
         "libjansson.so*"
       ],
       "project_markers": [
-        "Jansson"
+        "Jansson",
+        "akheron/jansson"
       ],
       "functions": [
         "json_loads",
+        "json_loadb",
         "json_load_file",
-        "json_dumps"
+        "json_load_callback",
+        "json_dumps",
+        "json_dump_file",
+        "json_object",
+        "json_array",
+        "json_string",
+        "json_pack",
+        "json_unpack",
+        "json_delete"
       ],
-      "strings": [],
-      "source_markers": [],
-      "version_regex": []
+      "strings": [
+        "JANSSON_VERSION",
+        "JSON_REJECT_DUPLICATES",
+        "JSON_DECODE_ANY",
+        "JSON_INDENT"
+      ],
+      "source_markers": [
+        "jansson.h",
+        "src/load.c",
+        "src/dump.c",
+        "src/value.c",
+        "src/pack_unpack.c"
+      ],
+      "version_regex": [
+        "(?i)\\bJansson\\s+v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b"
+      ]
     },
     {
       "name": "yaml-cpp",
@@ -2468,6 +2655,345 @@
       "strings": [],
       "source_markers": [],
       "version_regex": []
+    },
+    {
+      "name": "gtest",
+      "aliases": [
+        "googletest",
+        "google-test",
+        "libgtest",
+        "libgtest_main"
+      ],
+      "category": "testing",
+      "description_ru": "GoogleTest/GoogleMock C++ testing framework. Обычно build/test dependency, а не runtime-компонент продукта.",
+      "specificity": 72,
+      "library_patterns": [
+        "libgtest.so*",
+        "libgtest_main.so*",
+        "libgmock.so*",
+        "libgmock_main.so*"
+      ],
+      "project_markers": [
+        "GoogleTest",
+        "Google Test",
+        "Google C++ Testing and Mocking Framework"
+      ],
+      "functions": [
+        "testing::InitGoogleTest",
+        "testing::UnitTest::GetInstance",
+        "testing::Test::SetUp",
+        "testing::Test::TearDown",
+        "testing::internal::MakeAndRegisterTestInfo"
+      ],
+      "strings": [
+        "[==========] Running",
+        "[  PASSED  ]",
+        "[  FAILED  ]",
+        "gtest/gtest.h",
+        "gtest_filter",
+        "GTEST_FLAG_PREFIX_"
+      ],
+      "source_markers": [
+        "gtest-all.cc",
+        "gtest.cc",
+        "gtest_main.cc",
+        "gmock-all.cc",
+        "googletest/include/gtest/",
+        "googlemock/include/gmock/"
+      ],
+      "version_regex": [
+        "(?i)GoogleTest(?:\\s+version)?\\s+v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)"
+      ]
+    },
+    {
+      "name": "cereal",
+      "aliases": [
+        "libcereal"
+      ],
+      "category": "serialization",
+      "description_ru": "Header-only C++11 serialization library (binary/portable binary/JSON/XML archives).",
+      "specificity": 63,
+      "library_patterns": [],
+      "project_markers": [
+        "USCiLab/cereal",
+        "cereal - A C++11 library for serialization"
+      ],
+      "functions": [
+        "cereal::BinaryOutputArchive",
+        "cereal::BinaryInputArchive",
+        "cereal::PortableBinaryOutputArchive",
+        "cereal::PortableBinaryInputArchive",
+        "cereal::JSONOutputArchive",
+        "cereal::JSONInputArchive",
+        "cereal::XMLOutputArchive",
+        "cereal::XMLInputArchive"
+      ],
+      "strings": [
+        "cereal::detail::",
+        "cereal::NameValuePair",
+        "cereal::BinaryData",
+        "CEREAL_CLASS_VERSION",
+        "CEREAL_REGISTER_TYPE"
+      ],
+      "source_markers": [
+        "include/cereal/cereal.hpp",
+        "include/cereal/archives/binary.hpp",
+        "include/cereal/archives/portable_binary.hpp",
+        "include/cereal/archives/json.hpp",
+        "include/cereal/archives/xml.hpp",
+        "include/cereal/types/"
+      ],
+      "version_regex": [
+        "(?i)\\bcereal\\s+v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b"
+      ]
+    },
+    {
+      "name": "xgboost-r-package",
+      "aliases": [
+        "R-package",
+        "xgboost R package",
+        "R-package/xgboost"
+      ],
+      "category": "ml_binding",
+      "description_ru": "R language binding/subdirectory of XGBoost. Не считать отдельной OSS dependency от XGBoost без подтверждения отдельной поставки.",
+      "specificity": 65,
+      "library_patterns": [],
+      "project_markers": [
+        "xgboost/R-package",
+        "R-package/src/xgboost_R.cc"
+      ],
+      "functions": [
+        "XGBoosterCreate_R",
+        "XGBoosterSetParam_R",
+        "XGBoosterPredict_R",
+        "XGBoosterSaveModel_R",
+        "XGDMatrixCreateFromMat_R",
+        "XGDMatrixCreateFromCSR_R",
+        "XGDMatrixCreateFromCSC_R",
+        "XGDMatrixCreateFromDF_R"
+      ],
+      "strings": [
+        "xgb.DMatrix",
+        "xgb.Booster",
+        "xgb.train",
+        "XGBSetGlobalConfig_R",
+        "XGBGetGlobalConfig_R"
+      ],
+      "source_markers": [
+        "R-package/src/xgboost_R.cc",
+        "R-package/src/xgboost_R.h",
+        "R-package/R/xgb.DMatrix.R",
+        "R-package/R/xgboost.R"
+      ],
+      "version_regex": [
+        "(?i)\\bxgboost\\s+R\\s+(?:package\\s+)?v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b"
+      ]
+    },
+    {
+      "name": "libfpta-utils",
+      "aliases": [
+        "libfpta_utils",
+        "fpta_utils",
+        "libfpta",
+        "fpta"
+      ],
+      "category": "embedded_database",
+      "description_ru": "Utilities/API around libfpta, an embedded tabular/semistructured database. Exact libfpta_utils packaging may be product-specific.",
+      "specificity": 74,
+      "library_patterns": [
+        "libfpta_utils.so*",
+        "libfpta-utils.so*",
+        "libfpta.so*"
+      ],
+      "project_markers": [
+        "PositiveTechnologies/libfpta",
+        "libfpta",
+        "fast_positive/tables.h"
+      ],
+      "functions": [
+        "fpta_db_open",
+        "fpta_db_close",
+        "fpta_transaction_begin",
+        "fpta_transaction_end",
+        "fpta_cursor_open",
+        "fpta_cursor_close",
+        "fpta_table_create",
+        "fpta_column_describe",
+        "fpta_insert_row",
+        "fpta_update_row"
+      ],
+      "strings": [
+        "FPTA_SUCCESS",
+        "FPTA_SCHEMA_CORRUPTED",
+        "FPTA_FORMAT_MISMATCH",
+        "FPTA_APP_MISMATCH",
+        "fpta_txn",
+        "fpta_cursor"
+      ],
+      "source_markers": [
+        "fast_positive/tables.h",
+        "fast_positive/tuples.h",
+        "fast_positive/"
+      ],
+      "version_regex": [
+        "(?i)\\blibfpta\\s+v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b"
+      ]
+    },
+    {
+      "name": "libbroker",
+      "aliases": [
+        "broker",
+        "zeek-broker",
+        "libbroker"
+      ],
+      "category": "messaging",
+      "description_ru": "Broker is Zeek's messaging library for remote events/logging and distributed data stores.",
+      "specificity": 84,
+      "library_patterns": [
+        "libbroker.so*"
+      ],
+      "project_markers": [
+        "Broker: Zeek's Messaging Library",
+        "Zeek's Messaging Library",
+        "zeek/broker"
+      ],
+      "functions": [
+        "broker::endpoint",
+        "broker::publisher",
+        "broker::subscriber",
+        "broker::status_subscriber",
+        "broker::store",
+        "broker::topic",
+        "broker::data"
+      ],
+      "strings": [
+        "broker::endpoint_info",
+        "broker::peer_status",
+        "broker::network_info",
+        "broker::zeek::Event",
+        "broker::zeek::Batch"
+      ],
+      "source_markers": [
+        "libbroker/broker/endpoint.hh",
+        "libbroker/broker/publisher.hh",
+        "libbroker/broker/subscriber.hh",
+        "libbroker/broker/store.hh"
+      ],
+      "version_regex": [
+        "(?i)\\bBroker\\s+(?:version\\s+)?v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b"
+      ]
+    },
+    {
+      "name": "libpcomn",
+      "aliases": [
+        "libpcom",
+        "pcomn",
+        "pcom"
+      ],
+      "category": "cpp_infrastructure",
+      "description_ru": "C++ utility library identified by libpcom/libpcomn naming. Upstream identity is ambiguous; signatures intentionally conservative.",
+      "specificity": 43,
+      "library_patterns": [
+        "libpcomn.so*",
+        "libpcom.so*"
+      ],
+      "project_markers": [
+        "libpcomn",
+        "libpcom"
+      ],
+      "functions": [
+        "pcomn::"
+      ],
+      "strings": [
+        "pcomn::"
+      ],
+      "source_markers": [
+        "pcomn/"
+      ],
+      "version_regex": [
+        "(?i)\\blibpcomn?\\s+v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b"
+      ]
+    },
+    {
+      "name": "pypcap",
+      "aliases": [
+        "python-pycap",
+        "python-pypcap",
+        "py-pypcap",
+        "python3-pypcap",
+        "pcap-python"
+      ],
+      "category": "python_binding",
+      "description_ru": "Python extension/wrapper for libpcap (pypcap, module name pcap).",
+      "specificity": 58,
+      "library_patterns": [],
+      "project_markers": [
+        "pynetwork/pypcap",
+        "Python PCAP module",
+        "pypcap - python libpcap module",
+        "pypcap"
+      ],
+      "functions": [],
+      "strings": [
+        "pcap.pcap",
+        "pcap.findalldevs",
+        "import pcap",
+        "pypcap"
+      ],
+      "source_markers": [
+        "pcap.pyx",
+        "pcap_ex.c",
+        "pcap_ex.h",
+        "pypcap/setup.py"
+      ],
+      "version_regex": [
+        "(?i)\\bpypcap\\s+v?([0-9]+\\.[0-9]+(?:\\.[0-9]+)?)\\b"
+      ]
+    },
+    {
+      "name": "firmware-bnx2x",
+      "aliases": [
+        "firmaware-bnx2x",
+        "bnx2x firmware",
+        "bnx2x"
+      ],
+      "category": "firmware",
+      "description_ru": "Binary firmware package for Broadcom NetXtreme II 10Gb adapters handled by the bnx2x Linux driver; not a normal userspace library.",
+      "specificity": 76,
+      "library_patterns": [],
+      "project_markers": [
+        "firmware-bnx2x",
+        "Broadcom NetXtreme II 10Gb",
+        "bnx2x firmware",
+        "bnx2x-e1-",
+        "bnx2x-e1h-",
+        "bnx2x-e2-"
+      ],
+      "functions": [],
+      "strings": [
+        "bnx2x-e1-",
+        "bnx2x-e1h-",
+        "bnx2x-e2-",
+        "bnx2x-e1h",
+        "bnx2x-e2"
+      ],
+      "source_markers": [
+        "lib/firmware/bnx2x/",
+        "/firmware/bnx2x/",
+        "bnx2x-e1-",
+        "bnx2x-e1h-",
+        "bnx2x-e2-"
+      ],
+      "version_regex": [
+        "(?i)firmware-bnx2x[_ -]([0-9]{8}(?:-[0-9]+)?)"
+      ]
     }
-  ]
+  ],
+  "categories": {
+    "testing": "Testing framework",
+    "firmware": "Device firmware",
+    "python_binding": "Python native binding",
+    "ml_binding": "ML language binding",
+    "embedded_database": "Embedded database / storage utility"
+  }
 }
