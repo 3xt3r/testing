@@ -422,6 +422,324 @@ section{{margin-top:34px}} .notice{{background:#fff7ed;border:1px solid #fed7aa;
 </body></html>"""
     (outdir/"report.html").write_text(doc,encoding="utf-8")
 
+
+
+def write_xlsx_report_fallback(report, outdir):
+    """Create final_components.xlsx using only Python stdlib (minimal OOXML)."""
+    import zipfile
+    from xml.sax.saxutils import escape
+
+    path = outdir / "final_components.xlsx"
+
+    def clean(v):
+        if v is None:
+            return ""
+        s = str(v)
+        s = "".join(ch for ch in s if ord(ch) >= 32 or ch in "\t\n\r")
+        return s[:32767]
+
+    def col_letter(n):
+        out = ""
+        while n:
+            n, rem = divmod(n - 1, 26)
+            out = chr(65 + rem) + out
+        return out
+
+    def cell_xml(row, col, value, style=0):
+        ref = f"{col_letter(col)}{row}"
+        if isinstance(value, bool):
+            return f'<c r="{ref}" s="{style}" t="b"><v>{1 if value else 0}</v></c>'
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return f'<c r="{ref}" s="{style}"><v>{value}</v></c>'
+        txt = escape(clean(value))
+        preserve = ' xml:space="preserve"' if (txt.startswith(" ") or txt.endswith(" ") or "\n" in txt) else ""
+        return f'<c r="{ref}" s="{style}" t="inlineStr"><is><t{preserve}>{txt}</t></is></c>'
+
+    def sheet_xml(rows, widths=None, autofilter=True, freeze=True, confidence_col=None):
+        max_cols = max((len(r) for r in rows), default=1)
+        max_rows = max(len(rows), 1)
+        cols_xml = ""
+        if widths:
+            bits = [f'<col min="{i}" max="{i}" width="{w}" customWidth="1"/>' for i, w in enumerate(widths, 1)]
+            cols_xml = "<cols>" + "".join(bits) + "</cols>"
+        row_xml = []
+        for r_idx, row in enumerate(rows, 1):
+            cells = []
+            for c_idx, value in enumerate(row, 1):
+                if r_idx == 1:
+                    style = 1
+                elif c_idx == confidence_col:
+                    style = {
+                        "CONFIRMED_DYNAMIC": 4,
+                        "HIGH": 5,
+                        "MEDIUM": 6,
+                        "LOW": 7,
+                        "TRACE": 8,
+                    }.get(str(value), 2)
+                elif isinstance(value, (int, float)) and not isinstance(value, bool):
+                    style = 3
+                else:
+                    style = 2
+                cells.append(cell_xml(r_idx, c_idx, value, style))
+            row_xml.append(f'<row r="{r_idx}">' + "".join(cells) + '</row>')
+
+        if freeze:
+            pane = ('<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" '
+                    'activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>')
+        else:
+            pane = '<sheetViews><sheetView workbookViewId="0"/></sheetViews>'
+        af = f'<autoFilter ref="A1:{col_letter(max_cols)}{max_rows}"/>' if autofilter and rows else ""
+        return ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+                '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+                + pane + '<sheetFormatPr defaultRowHeight="15"/>' + cols_xml
+                + '<sheetData>' + ''.join(row_xml) + '</sheetData>' + af + '</worksheet>')
+
+    include_map = {
+        "CONFIRMED_DYNAMIC": "Да",
+        "HIGH": "После ручной верификации",
+        "MEDIUM": "Нет, сначала проверить",
+        "LOW": "Нет",
+        "TRACE": "Нет",
+    }
+    detect_map = {
+        "CONFIRMED_DYNAMIC": "ELF DT_NEEDED",
+        "HIGH": "static/derived heuristic",
+        "MEDIUM": "heuristic candidate",
+        "LOW": "weak heuristic",
+        "TRACE": "trace only",
+    }
+
+    comp_rows = [[
+        "Компонент", "Категория", "Confidence", "Score", "Версия",
+        "Тип обнаружения", "Файл(ы)", "Ключевые evidence",
+        "Интерпретация", "Включать в SBOM"
+    ]]
+    for r in report["components"]:
+        top = "; ".join(f'{e["kind"]}: {e["value"]}' for e in r["evidence"][:8])
+        comp_rows.append([
+            r["name"], r["category"], r["confidence"], r["score"],
+            ", ".join(r["versions"]) or "не определена",
+            detect_map.get(r["confidence"], "heuristic"),
+            "; ".join(r["files"]), top, r["interpretation"],
+            include_map.get(r["confidence"], "Нет")
+        ])
+
+    evidence_rows = [[
+        "Компонент", "Confidence", "Evidence type", "Weight",
+        "Value", "File", "Location", "Context"
+    ]]
+    for r in report["components"]:
+        for e in r["evidence"]:
+            evidence_rows.append([
+                r["name"], r["confidence"], e["kind"], e["weight"],
+                e["value"], e["file"], e["location"], e["context"]
+            ])
+
+    summary_rows = [
+        ["NDR/DPI scan summary", ""],
+        ["Target", report["target"]],
+        ["Architecture inference", report["architecture"]["overall"]],
+        ["", ""],
+        ["Metric", "Value"],
+    ]
+    for k, v in report["summary"].items():
+        summary_rows.append([k, v])
+    summary_rows += [
+        ["", ""],
+        ["Важно", "CONFIRMED_DYNAMIC основан на ELF DT_NEEDED. HIGH/MEDIUM — эвристические находки и требуют ручной проверки перед включением в официальный SBOM."]
+    ]
+
+    content_types = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+        '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+        '<Default Extension="xml" ContentType="application/xml"/>'
+        '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+        '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'
+        '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'
+        '<Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'
+        '<Override PartName="/xl/worksheets/sheet3.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'
+        '</Types>'
+    )
+    root_rels = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>'
+        '</Relationships>'
+    )
+    workbook_xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
+        'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+        '<sheets>'
+        '<sheet name="Компоненты" sheetId="1" r:id="rId1"/>'
+        '<sheet name="Evidence" sheetId="2" r:id="rId2"/>'
+        '<sheet name="Summary" sheetId="3" r:id="rId3"/>'
+        '</sheets></workbook>'
+    )
+    workbook_rels = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>'
+        '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>'
+        '<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet3.xml"/>'
+        '<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+        '</Relationships>'
+    )
+    styles_xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+        '<fonts count="3">'
+        '<font><sz val="10"/><name val="Arial"/></font>'
+        '<font><b/><color rgb="FFFFFFFF"/><sz val="10"/><name val="Arial"/></font>'
+        '<font><b/><sz val="10"/><name val="Arial"/></font>'
+        '</fonts>'
+        '<fills count="8">'
+        '<fill><patternFill patternType="none"/></fill>'
+        '<fill><patternFill patternType="gray125"/></fill>'
+        '<fill><patternFill patternType="solid"><fgColor rgb="FF1F4E78"/></patternFill></fill>'
+        '<fill><patternFill patternType="solid"><fgColor rgb="FFDCFCE7"/></patternFill></fill>'
+        '<fill><patternFill patternType="solid"><fgColor rgb="FFDBEAFE"/></patternFill></fill>'
+        '<fill><patternFill patternType="solid"><fgColor rgb="FFFEF3C7"/></patternFill></fill>'
+        '<fill><patternFill patternType="solid"><fgColor rgb="FFFFEDD5"/></patternFill></fill>'
+        '<fill><patternFill patternType="solid"><fgColor rgb="FFF3F4F6"/></patternFill></fill>'
+        '</fills>'
+        '<borders count="2">'
+        '<border><left/><right/><top/><bottom/><diagonal/></border>'
+        '<border><left style="thin"/><right style="thin"/><top style="thin"/><bottom style="thin"/><diagonal/></border>'
+        '</borders>'
+        '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+        '<cellXfs count="9">'
+        '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+        '<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
+        '<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
+        '<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyAlignment="1"><alignment horizontal="center"/></xf>'
+        '<xf numFmtId="0" fontId="2" fillId="3" borderId="1" xfId="0"/>'
+        '<xf numFmtId="0" fontId="2" fillId="4" borderId="1" xfId="0"/>'
+        '<xf numFmtId="0" fontId="0" fillId="5" borderId="1" xfId="0"/>'
+        '<xf numFmtId="0" fontId="0" fillId="6" borderId="1" xfId="0"/>'
+        '<xf numFmtId="0" fontId="0" fillId="7" borderId="1" xfId="0"/>'
+        '</cellXfs>'
+        '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>'
+        '</styleSheet>'
+    )
+
+    with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as z:
+        z.writestr("[Content_Types].xml", content_types)
+        z.writestr("_rels/.rels", root_rels)
+        z.writestr("xl/workbook.xml", workbook_xml)
+        z.writestr("xl/_rels/workbook.xml.rels", workbook_rels)
+        z.writestr("xl/styles.xml", styles_xml)
+        z.writestr("xl/worksheets/sheet1.xml", sheet_xml(comp_rows, [20,25,19,10,18,24,42,52,52,27], True, True, 3))
+        z.writestr("xl/worksheets/sheet2.xml", sheet_xml(evidence_rows, [20,18,24,9,36,42,16,70], True, True, 2))
+        z.writestr("xl/worksheets/sheet3.xml", sheet_xml(summary_rows, [30,90], False, False, None))
+
+    return path.exists() and path.stat().st_size > 0
+
+def write_xlsx_report(report, outdir):
+    """Write a polished final_components.xlsx when XlsxWriter is available."""
+    try:
+        import xlsxwriter
+    except ImportError:
+        print("[INFO] XlsxWriter is not installed; using built-in XLSX writer.")
+        return write_xlsx_report_fallback(report, outdir)
+
+    path = outdir / "final_components.xlsx"
+    wb = xlsxwriter.Workbook(path)
+    ws = wb.add_worksheet("Компоненты")
+    ev = wb.add_worksheet("Evidence")
+    sm = wb.add_worksheet("Summary")
+
+    header = wb.add_format({
+        "bold": True, "font_color": "white", "bg_color": "#1F4E78",
+        "align": "center", "valign": "vcenter", "text_wrap": True,
+        "border": 1
+    })
+    text = wb.add_format({"valign": "top", "text_wrap": True, "border": 1})
+    number = wb.add_format({"valign": "top", "align": "center", "border": 1})
+    title = wb.add_format({"bold": True, "font_size": 16, "font_color": "#1F4E78"})
+    note = wb.add_format({"text_wrap": True, "bg_color": "#FFF7ED", "border": 1})
+
+    headers = [
+        "Компонент", "Категория", "Confidence", "Score", "Версия",
+        "Тип обнаружения", "Файл(ы)", "Ключевые evidence",
+        "Интерпретация", "Включать в SBOM"
+    ]
+    for col, value in enumerate(headers):
+        ws.write(0, col, value, header)
+
+    include_map = {
+        "CONFIRMED_DYNAMIC": "Да",
+        "HIGH": "После ручной верификации",
+        "MEDIUM": "Нет, сначала проверить",
+        "LOW": "Нет",
+        "TRACE": "Нет",
+    }
+    detect_map = {
+        "CONFIRMED_DYNAMIC": "ELF DT_NEEDED",
+        "HIGH": "static/derived heuristic",
+        "MEDIUM": "heuristic candidate",
+        "LOW": "weak heuristic",
+        "TRACE": "trace only",
+    }
+
+    for row, r in enumerate(report["components"], 1):
+        top = "; ".join(f'{e["kind"]}: {e["value"]}' for e in r["evidence"][:8])
+        values = [
+            r["name"], r["category"], r["confidence"], r["score"],
+            ", ".join(r["versions"]) or "не определена",
+            detect_map.get(r["confidence"], "heuristic"),
+            "; ".join(r["files"]),
+            top, r["interpretation"], include_map.get(r["confidence"], "Нет")
+        ]
+        for col, value in enumerate(values):
+            ws.write(row, col, value, number if col == 3 else text)
+
+    ws.freeze_panes(1, 0)
+    ws.autofilter(0, 0, max(1, len(report["components"])), len(headers)-1)
+    widths = [20, 25, 19, 10, 18, 24, 42, 52, 52, 27]
+    for col, width in enumerate(widths):
+        ws.set_column(col, col, width)
+    ws.set_row(0, 34)
+
+    # Conditional formatting for Confidence
+    last = max(2, len(report["components"]) + 1)
+    ws.conditional_format(1, 2, last-1, 2, {"type": "text", "criteria": "containing", "value": "CONFIRMED_DYNAMIC", "format": wb.add_format({"bg_color": "#DCFCE7", "bold": True})})
+    ws.conditional_format(1, 2, last-1, 2, {"type": "text", "criteria": "containing", "value": "HIGH", "format": wb.add_format({"bg_color": "#DBEAFE", "bold": True})})
+    ws.conditional_format(1, 2, last-1, 2, {"type": "text", "criteria": "containing", "value": "MEDIUM", "format": wb.add_format({"bg_color": "#FEF3C7"})})
+    ws.conditional_format(1, 2, last-1, 2, {"type": "text", "criteria": "containing", "value": "LOW", "format": wb.add_format({"bg_color": "#FFEDD5"})})
+
+    # Evidence sheet
+    ev_headers = ["Компонент", "Confidence", "Evidence type", "Weight", "Value", "File", "Location", "Context"]
+    for col, value in enumerate(ev_headers):
+        ev.write(0, col, value, header)
+    erow = 1
+    for r in report["components"]:
+        for e in r["evidence"]:
+            vals = [r["name"], r["confidence"], e["kind"], e["weight"], e["value"], e["file"], e["location"], e["context"]]
+            for col, value in enumerate(vals):
+                ev.write(erow, col, value, number if col == 3 else text)
+            erow += 1
+    ev.freeze_panes(1, 0)
+    ev.autofilter(0, 0, max(1, erow-1), len(ev_headers)-1)
+    for col, width in enumerate([20,18,24,9,36,42,16,70]):
+        ev.set_column(col, col, width)
+
+    # Summary sheet
+    sm.write(0, 0, "NDR/DPI scan summary", title)
+    sm.write(2, 0, "Target", header); sm.write(2, 1, report["target"], text)
+    sm.write(3, 0, "Architecture inference", header); sm.write(3, 1, report["architecture"]["overall"], text)
+    sm.write(5, 0, "Metric", header); sm.write(5, 1, "Value", header)
+    rr = 6
+    for k, v in report["summary"].items():
+        sm.write(rr, 0, k, text); sm.write(rr, 1, v, number); rr += 1
+    sm.write(rr+1, 0, "Важно", header)
+    sm.write(rr+1, 1, "CONFIRMED_DYNAMIC основан на DT_NEEDED. HIGH/MEDIUM — эвристические находки и требуют ручной проверки перед включением в официальный SBOM.", note)
+    sm.set_column(0, 0, 28); sm.set_column(1, 1, 90)
+
+    wb.close()
+    return True
+
 def main():
     ap=argparse.ArgumentParser(description="Heuristic NDR/DPI OSS composition scanner")
     ap.add_argument("target",help="Binary file or directory")
@@ -434,6 +752,7 @@ def main():
     report=scan_path(target,db,args.include_traces)
     outdir=Path(args.outdir)
     write_outputs(report,outdir)
+    xlsx_ok = write_xlsx_report(report,outdir)
     print(json.dumps(report["summary"],indent=2,ensure_ascii=False))
     print("\nArchitecture:",report["architecture"]["overall"])
     print("\nTop components:")
@@ -443,6 +762,10 @@ def main():
     print("\nReport:",outdir/"report.html")
     print("JSON:  ",outdir/"report.json")
     print("CSV:   ",outdir/"components.csv")
+    if xlsx_ok and (outdir/"final_components.xlsx").exists():
+        print("XLSX:  ",outdir/"final_components.xlsx")
+    else:
+        print("XLSX:   ERROR — final_components.xlsx was not created")
     print("SBOM:  ",outdir/"candidate_sbom.cdx.json")
 
 if __name__=="__main__":
