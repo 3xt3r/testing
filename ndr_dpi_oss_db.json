@@ -1,3 +1,554 @@
-python3 -m ecosystem_management.vulnerability.dependency_track.sbom_confluence_standalone \
-    --sbom /path/to/your-dt-export.json \
-    --label my-scan
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:c2440c99-b982-47f8-8fce-34990759d872",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-08-18T11:50:01.503680Z",
+    "component": {
+      "type": "application",
+      "bom-ref": "application:safe-upstream-versions",
+      "name": "safe-upstream-versions",
+      "version": "2026-08-18"
+    },
+    "properties": [
+      {
+        "name": "security.scope",
+        "value": "Reviewed as safe-version candidates on 2026-08-18; future disclosures may change this status."
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "libxml2@2.15.3+git.c2e233fc",
+      "name": "libxml2",
+      "version": "2.15.3+git.c2e233fc",
+      "cpe": "cpe:2.3:a:xmlsoft:libxml2:2.15.3:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://gitlab.gnome.org/GNOME/libxml2/-/commit/c2e233fc1b341685fc99621b2768b503f777a72e"
+        },
+        {
+          "type": "website",
+          "url": "https://gitlab.gnome.org/GNOME/libxml2"
+        }
+      ],
+      "properties": [
+        {
+          "name": "source.repository",
+          "value": "https://gitlab.gnome.org/GNOME/libxml2"
+        },
+        {
+          "name": "source.ref",
+          "value": "c2e233fc1b341685fc99621b2768b503f777a72e"
+        },
+        {
+          "name": "safe-version.status",
+          "value": "patched-upstream-commit"
+        },
+        {
+          "name": "safe-version.verified-at",
+          "value": "2026-08-18"
+        },
+        {
+          "name": "safe-version.note",
+          "value": "No later official 2.15.x release available at verification time; use this exact patched upstream commit."
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "nghttp2@1.68.1",
+      "name": "nghttp2",
+      "version": "1.68.1",
+      "cpe": "cpe:2.3:a:nghttp2:nghttp2:1.68.1:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/nghttp2/nghttp2/tree/v1.68.1"
+        },
+        {
+          "type": "website",
+          "url": "https://github.com/nghttp2/nghttp2"
+        }
+      ],
+      "properties": [
+        {
+          "name": "source.repository",
+          "value": "https://github.com/nghttp2/nghttp2"
+        },
+        {
+          "name": "source.ref",
+          "value": "v1.68.1"
+        },
+        {
+          "name": "safe-version.status",
+          "value": "upstream-release"
+        },
+        {
+          "name": "safe-version.verified-at",
+          "value": "2026-08-18"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "nghttp2@1.69.0",
+      "name": "nghttp2",
+      "version": "1.69.0",
+      "cpe": "cpe:2.3:a:nghttp2:nghttp2:1.69.0:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/nghttp2/nghttp2/tree/v1.69.0"
+        },
+        {
+          "type": "website",
+          "url": "https://github.com/nghttp2/nghttp2"
+        }
+      ],
+      "properties": [
+        {
+          "name": "source.repository",
+          "value": "https://github.com/nghttp2/nghttp2"
+        },
+        {
+          "name": "source.ref",
+          "value": "v1.69.0"
+        },
+        {
+          "name": "safe-version.status",
+          "value": "upstream-release"
+        },
+        {
+          "name": "safe-version.verified-at",
+          "value": "2026-08-18"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "nghttp2@1.70.0",
+      "name": "nghttp2",
+      "version": "1.70.0",
+      "cpe": "cpe:2.3:a:nghttp2:nghttp2:1.70.0:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/nghttp2/nghttp2/tree/v1.70.0"
+        },
+        {
+          "type": "website",
+          "url": "https://github.com/nghttp2/nghttp2"
+        }
+      ],
+      "properties": [
+        {
+          "name": "source.repository",
+          "value": "https://github.com/nghttp2/nghttp2"
+        },
+        {
+          "name": "source.ref",
+          "value": "v1.70.0"
+        },
+        {
+          "name": "safe-version.status",
+          "value": "upstream-release"
+        },
+        {
+          "name": "safe-version.verified-at",
+          "value": "2026-08-18"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "openssl@3.0.21",
+      "name": "openssl",
+      "version": "3.0.21",
+      "cpe": "cpe:2.3:a:openssl:openssl:3.0.21:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/openssl/openssl/tree/openssl-3.0.21"
+        },
+        {
+          "type": "website",
+          "url": "https://github.com/openssl/openssl"
+        }
+      ],
+      "properties": [
+        {
+          "name": "source.repository",
+          "value": "https://github.com/openssl/openssl"
+        },
+        {
+          "name": "source.ref",
+          "value": "openssl-3.0.21"
+        },
+        {
+          "name": "safe-version.status",
+          "value": "upstream-release"
+        },
+        {
+          "name": "safe-version.verified-at",
+          "value": "2026-08-18"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "openssl@3.4.6",
+      "name": "openssl",
+      "version": "3.4.6",
+      "cpe": "cpe:2.3:a:openssl:openssl:3.4.6:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/openssl/openssl/tree/openssl-3.4.6"
+        },
+        {
+          "type": "website",
+          "url": "https://github.com/openssl/openssl"
+        }
+      ],
+      "properties": [
+        {
+          "name": "source.repository",
+          "value": "https://github.com/openssl/openssl"
+        },
+        {
+          "name": "source.ref",
+          "value": "openssl-3.4.6"
+        },
+        {
+          "name": "safe-version.status",
+          "value": "upstream-release"
+        },
+        {
+          "name": "safe-version.verified-at",
+          "value": "2026-08-18"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "openssl@3.5.7",
+      "name": "openssl",
+      "version": "3.5.7",
+      "cpe": "cpe:2.3:a:openssl:openssl:3.5.7:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/openssl/openssl/tree/openssl-3.5.7"
+        },
+        {
+          "type": "website",
+          "url": "https://github.com/openssl/openssl"
+        }
+      ],
+      "properties": [
+        {
+          "name": "source.repository",
+          "value": "https://github.com/openssl/openssl"
+        },
+        {
+          "name": "source.ref",
+          "value": "openssl-3.5.7"
+        },
+        {
+          "name": "safe-version.status",
+          "value": "upstream-release"
+        },
+        {
+          "name": "safe-version.verified-at",
+          "value": "2026-08-18"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "openssl@3.6.3",
+      "name": "openssl",
+      "version": "3.6.3",
+      "cpe": "cpe:2.3:a:openssl:openssl:3.6.3:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/openssl/openssl/tree/openssl-3.6.3"
+        },
+        {
+          "type": "website",
+          "url": "https://github.com/openssl/openssl"
+        }
+      ],
+      "properties": [
+        {
+          "name": "source.repository",
+          "value": "https://github.com/openssl/openssl"
+        },
+        {
+          "name": "source.ref",
+          "value": "openssl-3.6.3"
+        },
+        {
+          "name": "safe-version.status",
+          "value": "upstream-release"
+        },
+        {
+          "name": "safe-version.verified-at",
+          "value": "2026-08-18"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "openssl@4.0.1",
+      "name": "openssl",
+      "version": "4.0.1",
+      "cpe": "cpe:2.3:a:openssl:openssl:4.0.1:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/openssl/openssl/tree/openssl-4.0.1"
+        },
+        {
+          "type": "website",
+          "url": "https://github.com/openssl/openssl"
+        }
+      ],
+      "properties": [
+        {
+          "name": "source.repository",
+          "value": "https://github.com/openssl/openssl"
+        },
+        {
+          "name": "source.ref",
+          "value": "openssl-4.0.1"
+        },
+        {
+          "name": "safe-version.status",
+          "value": "upstream-release"
+        },
+        {
+          "name": "safe-version.verified-at",
+          "value": "2026-08-18"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "poco@1.15.3",
+      "name": "poco",
+      "version": "1.15.3",
+      "cpe": "cpe:2.3:a:pocoproject:poco:1.15.3:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/pocoproject/poco/tree/poco-1.15.3-release"
+        },
+        {
+          "type": "website",
+          "url": "https://github.com/pocoproject/poco"
+        }
+      ],
+      "properties": [
+        {
+          "name": "source.repository",
+          "value": "https://github.com/pocoproject/poco"
+        },
+        {
+          "name": "source.ref",
+          "value": "poco-1.15.3-release"
+        },
+        {
+          "name": "safe-version.status",
+          "value": "upstream-release"
+        },
+        {
+          "name": "safe-version.verified-at",
+          "value": "2026-08-18"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sqlite@3.53.2",
+      "name": "sqlite",
+      "version": "3.53.2",
+      "cpe": "cpe:2.3:a:sqlite:sqlite:3.53.2:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/sqlite/sqlite/tree/version-3.53.2"
+        },
+        {
+          "type": "website",
+          "url": "https://github.com/sqlite/sqlite"
+        }
+      ],
+      "properties": [
+        {
+          "name": "source.repository",
+          "value": "https://github.com/sqlite/sqlite"
+        },
+        {
+          "name": "source.ref",
+          "value": "version-3.53.2"
+        },
+        {
+          "name": "safe-version.status",
+          "value": "upstream-release"
+        },
+        {
+          "name": "safe-version.verified-at",
+          "value": "2026-08-18"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sqlite@3.53.3",
+      "name": "sqlite",
+      "version": "3.53.3",
+      "cpe": "cpe:2.3:a:sqlite:sqlite:3.53.3:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/sqlite/sqlite/tree/version-3.53.3"
+        },
+        {
+          "type": "website",
+          "url": "https://github.com/sqlite/sqlite"
+        }
+      ],
+      "properties": [
+        {
+          "name": "source.repository",
+          "value": "https://github.com/sqlite/sqlite"
+        },
+        {
+          "name": "source.ref",
+          "value": "version-3.53.3"
+        },
+        {
+          "name": "safe-version.status",
+          "value": "upstream-release"
+        },
+        {
+          "name": "safe-version.verified-at",
+          "value": "2026-08-18"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "sqlite@3.53.4",
+      "name": "sqlite",
+      "version": "3.53.4",
+      "cpe": "cpe:2.3:a:sqlite:sqlite:3.53.4:*:*:*:*:*:*:*",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/sqlite/sqlite/tree/version-3.53.4"
+        },
+        {
+          "type": "website",
+          "url": "https://github.com/sqlite/sqlite"
+        }
+      ],
+      "properties": [
+        {
+          "name": "source.repository",
+          "value": "https://github.com/sqlite/sqlite"
+        },
+        {
+          "name": "source.ref",
+          "value": "version-3.53.4"
+        },
+        {
+          "name": "safe-version.status",
+          "value": "upstream-release"
+        },
+        {
+          "name": "safe-version.verified-at",
+          "value": "2026-08-18"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "application:safe-upstream-versions",
+      "dependsOn": [
+        "libxml2@2.15.3+git.c2e233fc",
+        "nghttp2@1.68.1",
+        "nghttp2@1.69.0",
+        "nghttp2@1.70.0",
+        "openssl@3.0.21",
+        "openssl@3.4.6",
+        "openssl@3.5.7",
+        "openssl@3.6.3",
+        "openssl@4.0.1",
+        "poco@1.15.3",
+        "sqlite@3.53.2",
+        "sqlite@3.53.3",
+        "sqlite@3.53.4"
+      ]
+    },
+    {
+      "ref": "libxml2@2.15.3+git.c2e233fc",
+      "dependsOn": []
+    },
+    {
+      "ref": "nghttp2@1.68.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "nghttp2@1.69.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "nghttp2@1.70.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "openssl@3.0.21",
+      "dependsOn": []
+    },
+    {
+      "ref": "openssl@3.4.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "openssl@3.5.7",
+      "dependsOn": []
+    },
+    {
+      "ref": "openssl@3.6.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "openssl@4.0.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "poco@1.15.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "sqlite@3.53.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "sqlite@3.53.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "sqlite@3.53.4",
+      "dependsOn": []
+    }
+  ]
+}
