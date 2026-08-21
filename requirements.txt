@@ -1,2 +1,0 @@
-# Optional only; XLSX output has a stdlib fallback.
-XlsxWriter>=3.1
